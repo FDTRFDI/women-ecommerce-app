@@ -1,0 +1,201 @@
+/* =============================
+   PAGE
+============================= */
+
+.orders-page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.orders-page h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  color: #222;
+}
+
+
+/* =============================
+   ORDER CARD
+============================= */
+
+.order-card {
+  background: #ffffff;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.order-card:hover {
+  transform: translateY(-3px);
+}
+
+
+/* =============================
+   HEADER
+============================= */
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.order-header h3 {
+  margin: 0;
+  color: #111;
+}
+
+.order-header p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #777;
+}
+
+.order-info {
+  text-align: right;
+}
+
+.price {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  color: #111;
+  margin-bottom: 6px;
+}
+
+.order-header button {
+  background: black;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.order-header button:hover {
+  background: #333;
+}
+
+
+/* =============================
+   STATUS BADGE
+============================= */
+
+.status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+/* Pending */
+.pending {
+  background: #ffe7a0;
+  color: #8a6d00;
+}
+
+/* Processing */
+.processing {
+  background: #cfe2ff;
+  color: #084298;
+}
+
+/* Shipped */
+.shipped {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+/* Delivered */
+.delivered {
+  background: #d4edda;
+  color: #155724;
+}
+
+
+/* =============================
+   ORDER ITEMS (Dropdown)
+============================= */
+
+.order-items {
+  background: #fafafa;
+  padding: 15px 20px;
+}
+
+
+/* =============================
+   SINGLE ITEM
+============================= */
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.order-item img {
+  width: 65px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+
+/* =============================
+   ITEM DETAILS
+============================= */
+
+.item-details {
+  flex: 1;
+  margin-left: 15px;
+}
+
+.item-details h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #111;
+}
+
+.item-details p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #777;
+}
+
+
+/* =============================
+   ITEM PRICE
+============================= */
+
+.item-price {
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
+}
+
+
+/* =============================
+   EMPTY STATE
+============================= */
+
+.order-items p {
+  text-align: center;
+  color: #777;
+  padding: 10px;
+}

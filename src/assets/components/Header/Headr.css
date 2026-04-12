@@ -1,0 +1,79 @@
+:root {
+  --main-color: #ff4d8d;
+}
+
+/* HEADER */
+.header {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column; /* مهم */
+  border-bottom: 1px solid rgba(255, 182, 193, 0.3);
+}
+
+/* TOP CONTAINER */
+.header-container {
+  width: 92%;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+/* CATEGORY WRAPPER */
+.header-navbar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* LOGO */
+.logo img {
+  height: 42px;
+  cursor: pointer;
+}
+
+/* SEARCH */
+.search-box {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-box input {
+  width: 100%;
+  max-width: 450px;
+  padding: 12px 18px;
+  border-radius: 30px;
+  border: 1px solid #eee;
+}
+
+/* ACTIONS */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* LOGIN */
+.login-btn {
+  background: linear-gradient(135deg, #ff4d8d, #ff85a2);
+  color: white;
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* SPACE FIX (مهم جدًا) */
+.main-container {
+  padding-top: 130px; /* 👈 يمنع تداخل الصور */
+}

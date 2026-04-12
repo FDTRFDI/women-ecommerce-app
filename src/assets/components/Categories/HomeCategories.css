@@ -1,0 +1,146 @@
+/* Main Section */
+.main-home-page {
+  width: 100%;
+  padding: 50px 20px;
+  background: linear-gradient(180deg, #fff 0%, #fff5fa 100%);
+}
+
+/* Header */
+.categories-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.categories-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ff4f8b;
+  letter-spacing: 0.5px;
+}
+
+/* Explore text */
+.explore-text {
+  display: block;
+  margin-top: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ff4f8b;
+  text-align: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Grid */
+.categories-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+/* Card */
+.category-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.35s ease;
+  box-shadow: 0 8px 25px rgba(255, 80, 140, 0.12);
+  border: 1px solid rgba(255, 80, 140, 0.15);
+  text-align: center;
+}
+
+/* Hover */
+.category-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 15px 35px rgba(255, 80, 140, 0.25);
+  border-color: rgba(255, 80, 140, 0.35);
+}
+
+/* Image (Responsive FIX 🔥) */
+.category-card img {
+  width: 100%;
+  aspect-ratio: 3 / 4; /* أهم تعديل */
+  object-fit: cover;
+  object-position: top;
+  transition: 0.4s ease;
+}
+
+.category-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Title */
+.category-card h3 {
+  margin: 18px 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Button */
+.category-card button {
+  margin-bottom: 20px;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #ff4f8b, #ff7fb0);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 80, 140, 0.25);
+}
+
+.category-card button:hover {
+  background: linear-gradient(135deg, #ff2f75, #ff6fa5);
+  box-shadow: 0 6px 18px rgba(255, 80, 140, 0.35);
+  transform: translateY(-2px);
+}
+
+/* ========================= */
+/* 📱 MOBILE RESPONSIVE */
+/* ========================= */
+@media (max-width: 768px) {
+
+  .main-home-page {
+    padding: 30px 15px;
+  }
+
+  .categories-header h2 {
+    font-size: 22px;
+  }
+
+  .categories-row {
+    gap: 18px;
+  }
+
+  .category-card h3 {
+    font-size: 18px;
+  }
+
+  .category-card button {
+    width: 90%;
+    padding: 12px;
+  }
+
+  .explore-text {
+    font-size: 13px;
+  }
+}
+
+/* 📱 Small phones */
+@media (max-width: 480px) {
+
+  .categories-header h2 {
+    font-size: 20px;
+  }
+
+  .categories-row {
+    grid-template-columns: 1fr; /* كارد واحد */
+  }
+
+  .category-card button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,92 @@
+.navbar {
+  width: 100%;
+  padding: 10px 0;
+  background: transparent; /* مهم */
+  border-top: 1px solid rgba(255, 182, 193, 0.3);
+}
+
+/* LINKS */
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+}
+
+/* ITEM */
+.nav-item {
+  position: relative;
+}
+
+/* TITLE */
+.nav-title {
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-title:hover {
+  color: var(--main-color);
+}
+
+/* MEGA MENU */
+.mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+
+  background: #fff;
+  padding: 20px;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: 0.3s;
+}
+
+.nav-item:hover .mega-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* CONTENT */
+.mega-container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  gap: 40px;
+}
+
+/* COLUMNS */
+.mega-col h4 {
+  color: var(--main-color);
+}
+
+.mega-col a {
+  display: block;
+  color: #333;
+  font-size: 13px;
+  margin-bottom: 6px;
+  text-decoration: none;
+}
+
+.mega-col a:hover {
+  color: var(--main-color);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .nav-links {
+    overflow-x: auto;
+    gap: 16px;
+  }
+
+  .mega-menu {
+    position: static;
+  }
+}

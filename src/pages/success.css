@@ -1,0 +1,79 @@
+.payment-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f1f5f9;
+}
+
+.payment-box {
+  background: white;
+  padding: 30px;
+  border-radius: 14px;
+  width: 380px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.payment-box h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* VISA CARD */
+.visa-card {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.visa-chip {
+  width: 40px;
+  height: 30px;
+  background: gold;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.visa-card h3 {
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.visa-card p {
+  margin: 0;
+}
+
+.visa-card span {
+  font-size: 14px;
+}
+
+/* FORM */
+.payment-box input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.card-row {
+  display: flex;
+  gap: 10px;
+}
+
+.pay-btn {
+  width: 100%;
+  padding: 12px;
+  background: #16a34a;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pay-btn:hover {
+  background: #15803d;
+}

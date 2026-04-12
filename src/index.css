@@ -1,0 +1,36 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* REMOVE SIDE SCROLL */
+
+:root {
+  --bg-main: #f7f7f7;
+  --bg-card: #ffffff;
+  --primary: #facc15;   /* الأصفر بتاع الهيدر */
+  --secondary: #111827;
+  --text-main: #1f2933;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(180deg, #0f0d00 0%,  #0f0d00  40%, #0f0d00  100%);
+  color: var(--text-main);
+}
+
+
+
+/* Container عام للموقع */
+.site-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}

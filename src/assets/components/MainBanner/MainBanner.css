@@ -1,0 +1,94 @@
+/* ===== SLIDE ===== */
+.banner-slide {
+  position: relative;
+  width: 100%;
+  height: 700px;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+/* ===== IMAGE (ثابتة تمامًا) ===== */
+.banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left 20%;
+
+  transform: none !important;
+  transition: none !important;
+}
+
+/* ❌ إلغاء أي hover نهائي */
+.banner-slide:hover img {
+  transform: none !important;
+}
+
+/* ===== OVERLAY ===== */
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 182, 193, 0.20),
+    rgba(255, 192, 203, 0.05),
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* ===== TEXT (ثابت) ===== */
+.banner-content {
+  position: absolute;
+  top: 50%;
+  left: 6%;
+  transform: translateY(-50%) !important;
+  color: #fff;
+  max-width: 420px;
+  z-index: 2;
+}
+
+/* ❌ إلغاء hover للنص */
+.banner-slide:hover .banner-content {
+  transform: translateY(-50%) !important;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.banner-content h2 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.banner-content p {
+  font-size: 17px;
+  margin-bottom: 20px;
+  opacity: 0.95;
+}
+
+/* ===== BUTTON (بدون حركة قوية) ===== */
+.banner-btn {
+  background: #D4AF37;
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: none; /* ❌ إلغاء أي animation */
+}
+
+/* Hover بسيط جدًا */
+.banner-btn:hover {
+  background: #D4AF37;
+  transform: none;
+}
+
+/* ===== SHADOW ثابت ===== */
+.banner-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.10);
+  pointer-events: none;
+}

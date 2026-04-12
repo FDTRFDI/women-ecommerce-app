@@ -1,0 +1,147 @@
+/* PAGE */
+.category-products-page {
+  padding: 15px;
+}
+
+/* GRID */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* 👈 أصغر للموبايل */
+  gap: 15px;
+}
+
+/* CARD */
+.product-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  transition: 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+/* IMAGE */
+.category-product-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* NO IMAGE */
+.no-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+  border-radius: 10px;
+  color: #777;
+}
+
+/* TITLE */
+.product-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+  color: #333;
+
+  /* 👇 مهم عشان ميكسرش */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* PRICE */
+.product-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #e6007e;
+  margin-top: 5px;
+}
+
+/* DISCOUNT */
+.discount-tag {
+  background: #ff3b30;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-left: 5px;
+}
+
+/* RATING */
+.rating-stars {
+  color: #ffcc00;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* FOOTER (زرار +) */
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* 👈 مهم يخلي الزرار تحت */
+}
+
+/* ADD BUTTON */
+.add-btn {
+  background: #000;
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* ========================= */
+/* 📱 TABLET */
+/* ========================= */
+@media (min-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* ========================= */
+/* 📱 MOBILE SMALL */
+/* ========================= */
+@media (max-width: 480px) {
+
+  .category-products-page {
+    padding: 10px;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr); /* 👈 2 كارد جنب بعض */
+    gap: 12px;
+  }
+
+  .product-title {
+    font-size: 13px;
+  }
+
+  .product-price {
+    font-size: 15px;
+  }
+
+  .add-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+}

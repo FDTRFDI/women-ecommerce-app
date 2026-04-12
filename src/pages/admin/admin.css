@@ -1,0 +1,134 @@
+/* ============================
+   GENERAL LAYOUT
+============================ */
+.admin-dashboard-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.admin-title {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* ============================
+   FORM STYLING
+============================ */
+.admin-form {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ddd;
+  margin-bottom: 40px;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+.admin-form textarea {
+  height: 120px;
+  resize: vertical;
+}
+
+.admin-section-title {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* ============================
+   BUTTONS
+============================ */
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  color: #fff;
+}
+
+.btn.primary {
+  background: #007bff;
+}
+
+.btn.success {
+  background: #28a745;
+}
+
+.btn.danger {
+  background: #dc3545;
+}
+
+.btn.small {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* ============================
+   TABLE STYLING
+============================ */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.admin-table th {
+  background: #f5f5f5;
+  font-weight: bold;
+}
+
+.admin-table tr:hover {
+  background: #fafafa;
+}
+
+/* ============================
+   TAGS (Colors & Sizes)
+============================ */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.tag {
+  background: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+/* ============================
+   ROWS
+============================ */
+.admin-forms-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.admin-forms-row input {
+  flex: 1;
+}

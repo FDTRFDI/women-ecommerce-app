@@ -1,0 +1,36 @@
+.assign-page {
+  width: 400px;
+  margin: auto;
+  padding: 40px;
+  text-align: center;
+}
+
+.assign-page h2 {
+  margin-bottom: 30px;
+}
+
+.assign-box {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.assign-box select {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.assign-btn {
+  padding: 12px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.assign-btn:hover {
+  background: #333;
+}
