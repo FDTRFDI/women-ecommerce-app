@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import API from "../../config/api";
+import API from "../src/config/api";
 import "./ProDetails.css";
 import { CartContext } from "../context/CartContext";
 
 const ProDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+s
   const { addToCart } = useContext(CartContext);
 
   const [product, setProduct] = useState(null);
