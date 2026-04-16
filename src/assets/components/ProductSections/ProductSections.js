@@ -7,7 +7,7 @@ const ProductSections = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch(`${API}/api/products`)
+    fetch(`${API}/api/category-products`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

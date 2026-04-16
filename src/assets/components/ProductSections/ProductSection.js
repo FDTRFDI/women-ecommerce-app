@@ -20,18 +20,15 @@ const ProductSection = ({ title, products = [] }) => {
           <p className="no-products">No products available</p>
         ) : (
           products.map((product) => {
-            const productId =
-              product.id ||
-              product.product_id ||
-              product._id;
+            const productId = product.id;
 
             const rating = product.rating || 4.5;
             const discount = product.discount || 15;
 
+            // main_image OR first gallery image
             const imagePath =
-              product.gallery_image ||
-              product.image ||
-              "";
+              product.main_image ||
+              (product.gallery?.length > 0 ? product.gallery[0] : "");
 
             const imageUrl = imagePath.startsWith("http")
               ? imagePath
@@ -48,12 +45,12 @@ const ProductSection = ({ title, products = [] }) => {
                 <div className="image-wrapper">
                   <img
                     src={imageUrl}
-                    alt={product.name}
+                    alt={product.title}
                     loading="lazy"
                   />
                 </div>
 
-                <div className="name">{product.name}</div>
+                <div className="name">{product.title}</div>
 
                 <div className="rating">⭐ {rating}</div>
 
@@ -65,7 +62,7 @@ const ProductSection = ({ title, products = [] }) => {
                     e.stopPropagation();
                     addToCart({
                       id: productId,
-                      name: product.name,
+                      name: product.title,
                       price: product.price,
                       image: imageUrl,
                     });
