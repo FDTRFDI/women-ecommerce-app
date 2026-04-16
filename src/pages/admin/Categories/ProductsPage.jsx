@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./ProductsPage.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 function ProductsPage() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -20,7 +22,7 @@ function ProductsPage() {
 
   // Fetch categories
   useEffect(() => {
-    fetch("http://localhost:5000/api/categories")
+    fetch(`${API}/api/categories`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setCategories(data);
@@ -30,7 +32,7 @@ function ProductsPage() {
 
   // Fetch products
   useEffect(() => {
-    fetch("http://localhost:5000/api/category-products")
+    fetch(`${API}/api/category-products`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setProducts(data);
@@ -59,17 +61,15 @@ function ProductsPage() {
     if (mainImage) fd.append("main_image", mainImage);
     gallery.forEach((img) => fd.append("gallery", img));
 
-    const res = await fetch("http://localhost:5000/api/category-products", {
+    const res = await fetch(`${API}/api/category-products`, {
       method: "POST",
       body: fd,
     });
 
     const newProduct = await res.json();
 
-    // أضف المنتج مباشرة بدون Reload
     setProducts([...products, newProduct]);
 
-    // Reset form
     setForm({
       title: "",
       description: "",
@@ -86,7 +86,7 @@ function ProductsPage() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this product?")) return;
 
-    await fetch(`http://localhost:5000/api/category-products/${id}`, {
+    await fetch(`${API}/api/category-products/${id}`, {
       method: "DELETE",
     });
 
@@ -191,15 +191,15 @@ function ProductsPage() {
             <tr key={p.id || p._id}>
               <td>
                 <img
-  src={
-    p.main_image
-      ? `http://localhost:5000${p.main_image}`
-      : p.image
-      ? `http://localhost:5000${p.image}`
-      : p.image_url || p.mainImage
-  }
-  className="product-img"
-/>
+                  src={
+                    p.main_image
+                      ? `${API}${p.main_image}`
+                      : p.image
+                      ? `${API}${p.image}`
+                      : p.image_url || p.mainImage
+                  }
+                  className="product-img"
+                />
               </td>
 
               <td>{p.title}</td>

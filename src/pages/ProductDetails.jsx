@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import "./ProductDetails.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 const ProductDetails = () => {
   const { id } = useParams();
   const { addToCart } = useContext(CartContext);
@@ -12,18 +14,19 @@ const ProductDetails = () => {
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/products/${id}`)
+    fetch(`${API}/api/products/${id}`)
       .then(res => res.json())
-      .then(data => setProduct(data));
+      .then(data => setProduct(data))
+      .catch(err => console.error(err));
   }, [id]);
 
   if (!product) return <h2 className="loading">Loading...</h2>;
 
   const images =
     product.images && product.images.length > 0
-      ? product.images.map(img => `http://localhost:5000${img}`)
+      ? product.images.map(img => `${API}${img}`)
       : product.image
-      ? [`http://localhost:5000${product.image}`]
+      ? [`${API}${product.image}`]
       : [];
 
   const nextImage = () =>
@@ -97,8 +100,6 @@ const ProductDetails = () => {
         {/* ACTION BUTTONS */}
         <div className="actions">
 
-          {/* ❌ زر Send inquiry اتشال */}
-
           <button
             className="cart-btn"
             onClick={() =>
@@ -113,7 +114,6 @@ const ProductDetails = () => {
             Add to cart
           </button>
 
-          {/* 🔥 زر واتساب بدل Chat now */}
           <a
             href="https://wa.me/+971545234489"
             target="_blank"

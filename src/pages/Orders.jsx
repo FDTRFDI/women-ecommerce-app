@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 function Orders() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/orders/my-orders/1")
+      .get(`${API}/api/orders/my-orders/1`)
       .then((res) => setOrders(res.data))
       .catch((err) => console.error(err));
   }, []);

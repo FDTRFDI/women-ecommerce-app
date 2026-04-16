@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./CategoryProducts.css";
 import { CartContext } from "../../../context/CartContext";
 
-const API = "http://localhost:5000";
+const API = "https://backend-women-ecommerce-2.onrender.com";
 
 function CategoryProducts() {
   const { id } = useParams();
@@ -78,7 +78,6 @@ function CategoryProducts() {
             return (
               <div key={productId} className="product-card">
                 
-                {/* منطقة الضغط للانتقال للتفاصيل */}
                 <div
                   className="click-area"
                   onClick={() => navigate(`/prodetails/${productId}`)}
@@ -104,7 +103,6 @@ function CategoryProducts() {
                   </div>
                 </div>
 
-                {/* زر الإضافة للسلة */}
                 <button
                   className="add-btn"
                   onClick={(e) => {

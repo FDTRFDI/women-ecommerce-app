@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ProductSection from "./ProductSection";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 const ProductSections = () => {
-  const [products, setProducts] = useState([]) ;
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
+    fetch(`${API}/api/products`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -18,7 +20,7 @@ const ProductSections = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  // ⭐ Best Deals = أرخص 10 منتجات
+  // ⭐ Best Deals = أرخص 100 منتج
   const bestDeals = [...products]
     .sort((a, b) => a.price - b.price)
     .slice(0, 100);

@@ -15,6 +15,8 @@ const stripePromise = loadStripe(
   "pk_test_51T2GkQRV7UWVJc5vPmDUn7CJc07RVWn246msyB47JlMmvLcLPsL3e3Bb7qE62pnngNLCJQgDZIHjVWO83opI1Jzo00GForbZFg"
 );
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 const CheckoutForm = ({ total }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -46,7 +48,7 @@ const CheckoutForm = ({ total }) => {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/payment/create-payment-intent",
+        `${API}/api/payment/create-payment-intent`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

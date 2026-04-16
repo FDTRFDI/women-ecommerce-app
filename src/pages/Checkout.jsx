@@ -3,6 +3,8 @@ import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "./checkout.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 const Checkout = () => {
   const { cart, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/orders", {
+      const res = await fetch(`${API}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,10 +88,10 @@ const Checkout = () => {
         })
       );
 
-      // 🔥 أهم خطوة: تصفير السلة بعد نجاح الطلب
+      // Clear cart
       clearCart();
 
-      // Go to payment page with total
+      // Go to payment page
       navigate("/payment", { state: { total: totalPrice } });
 
     } catch (error) {

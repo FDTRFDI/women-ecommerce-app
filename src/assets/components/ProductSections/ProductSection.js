@@ -3,6 +3,8 @@ import { CartContext } from "../../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "./ProductSections.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 const ProductSection = ({ title, products = [] }) => {
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
@@ -26,6 +28,15 @@ const ProductSection = ({ title, products = [] }) => {
             const rating = product.rating || 4.5;
             const discount = product.discount || 15;
 
+            const imagePath =
+              product.gallery_image ||
+              product.image ||
+              "";
+
+            const imageUrl = imagePath.startsWith("http")
+              ? imagePath
+              : `${API}${imagePath}`;
+
             return (
               <div
                 className="noon-card"
@@ -36,7 +47,7 @@ const ProductSection = ({ title, products = [] }) => {
 
                 <div className="image-wrapper">
                   <img
-                    src={`http://localhost:5000${product.gallery_image || product.image}`}
+                    src={imageUrl}
                     alt={product.name}
                     loading="lazy"
                   />
@@ -56,7 +67,7 @@ const ProductSection = ({ title, products = [] }) => {
                       id: productId,
                       name: product.name,
                       price: product.price,
-                      image: product.image,
+                      image: imageUrl,
                     });
                   }}
                 >

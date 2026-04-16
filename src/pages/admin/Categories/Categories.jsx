@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../utils/axios";
 import "./Categories.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 const Categories = () => {
   const navigate = useNavigate();
 
@@ -39,7 +41,6 @@ const Categories = () => {
       formData.append("description", description);
       formData.append("parent_id", parentId || null);
 
-      // لو المستخدم ما رفعش صورة جديدة → احتفظ بالقديمة
       if (mainImage) {
         formData.append("main_image", mainImage);
       } else {
@@ -116,11 +117,10 @@ const Categories = () => {
             ))}
         </select>
 
-        {/* عرض الصورة الحالية أثناء التعديل */}
         {editingId &&
           categories.find((c) => c.id === editingId)?.main_image && (
             <img
-              src={`http://localhost:5000${
+              src={`${API}${
                 categories.find((c) => c.id === editingId).main_image
               }`}
               width="80"
@@ -155,7 +155,7 @@ const Categories = () => {
               <td>
                 {c.main_image && (
                   <img
-                    src={`http://localhost:5000${c.main_image}`}
+                    src={`${API}${c.main_image}`}
                     width="60"
                     alt=""
                   />

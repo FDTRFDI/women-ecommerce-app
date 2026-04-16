@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./OrderHistory.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [openOrder, setOpenOrder] = useState(null);
@@ -36,7 +38,7 @@ function OrderHistory() {
     }
 
     axios
-      .get("http://localhost:5000/api/orders/my-orders", {
+      .get(`${API}/api/orders/my-orders`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -58,10 +60,7 @@ function OrderHistory() {
     }
 
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/orders/${orderId}/items`
-      );
-
+      const res = await axios.get(`${API}/api/orders/${orderId}/items`);
       setItems(res.data);
       setOpenOrder(orderId);
     } catch (err) {

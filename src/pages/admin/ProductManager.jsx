@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "../../utils/axios";
 import "./admin.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 const ProductManager = () => {
   const emptyForm = {
     name: "",
@@ -184,7 +186,7 @@ const ProductManager = () => {
           {products.map((p) => (
             <tr key={p.id}>
               <td>
-                {p.image && <img src={`http://localhost:5000${p.image}`} width="60" />}
+                {p.image && <img src={`${API}${p.image}`} width="60" />}
               </td>
               <td>{p.name}</td>
               <td>{p.price}</td>

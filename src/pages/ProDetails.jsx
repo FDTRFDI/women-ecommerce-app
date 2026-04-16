@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import API from "../../src/src/config/api";
+import API from "../config/api"; // ← تم تصحيح المسار
 import "./ProDetails.css";
 import { CartContext } from "../context/CartContext";
 
@@ -15,8 +15,9 @@ const ProDetails = () => {
 
   useEffect(() => {
     fetch(`${API}/api/category-products/product/${id}`)
-      .then(res => res.json())
-      .then(data => setProduct(data));
+      .then((res) => res.json())
+      .then((data) => setProduct(data))
+      .catch((err) => console.error(err));
   }, [id]);
 
   if (!product) return <h2 className="loading">Loading...</h2>;
@@ -32,16 +33,16 @@ const ProDetails = () => {
       ? product.gallery
       : JSON.parse(product.gallery);
 
-    galleryImages.forEach(img => {
+    galleryImages.forEach((img) => {
       images.push(`${API}${img}`);
     });
   }
 
   const nextImage = () =>
-    setCurrent(prev => (prev + 1) % images.length);
+    setCurrent((prev) => (prev + 1) % images.length);
 
   const prevImage = () =>
-    setCurrent(prev => (prev === 0 ? images.length - 1 : prev - 1));
+    setCurrent((prev) => (prev === 0 ? images.length - 1 : prev - 1));
 
   return (
     <div className="ProDetails">

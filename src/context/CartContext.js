@@ -3,7 +3,7 @@ import { createContext, useState, useEffect } from "react";
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const API = "http://localhost:5000/api";
+const API = "https://backend-women-ecommerce-2.onrender.com";
 
   const [cart, setCart] = useState([]);
 

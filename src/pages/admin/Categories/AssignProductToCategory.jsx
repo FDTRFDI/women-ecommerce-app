@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./AssignProductToCategory.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 function AssignProductToCategory() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -10,7 +12,7 @@ function AssignProductToCategory() {
 
   // Fetch products
   useEffect(() => {
-    fetch("http://localhost:5000/api/category-products")
+    fetch(`${API}/api/category-products`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -26,7 +28,7 @@ function AssignProductToCategory() {
 
   // Fetch categories
   useEffect(() => {
-    fetch("http://localhost:5000/api/categories")
+    fetch(`${API}/api/categories`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -47,19 +49,16 @@ function AssignProductToCategory() {
     }
 
     try {
-      const res = await fetch(
-        "http://localhost:5000/api/category-products/assign",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            product_id: selectedProduct,
-            category_id: selectedCategory,
-          }),
-        }
-      );
+      const res = await fetch(`${API}/api/category-products/assign`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          product_id: selectedProduct,
+          category_id: selectedCategory,
+        }),
+      });
 
       const data = await res.json();
 
@@ -80,43 +79,34 @@ function AssignProductToCategory() {
 
       <div className="assign-box">
         {/* Product */}
-
         <select
           value={selectedProduct}
-          onChange={(e) =>
-            setSelectedProduct(e.target.value)
-          }
+          onChange={(e) => setSelectedProduct(e.target.value)}
         >
           <option value="">Select Product</option>
 
           {products.map((p) => (
-            <option key={p.id} value={p.id}>
+            <option key={p.id || p._id} value={p.id || p._id}>
               {p.title}
             </option>
           ))}
         </select>
 
         {/* Category */}
-
         <select
           value={selectedCategory}
-          onChange={(e) =>
-            setSelectedCategory(e.target.value)
-          }
+          onChange={(e) => setSelectedCategory(e.target.value)}
         >
           <option value="">Select Category</option>
 
           {categories.map((c) => (
-            <option key={c.id} value={c.id}>
+            <option key={c.id || c._id} value={c.id || c._id}>
               {c.title}
             </option>
           ))}
         </select>
 
-        <button
-          onClick={handleAssign}
-          className="assign-btn"
-        >
+        <button onClick={handleAssign} className="assign-btn">
           Assign Product
         </button>
       </div>

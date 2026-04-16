@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./myOrders.css";
 
+const API = "https://backend-women-ecommerce-2.onrender.com";
+
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ export default function MyOrders() {
       return;
     }
 
-    fetch("http://localhost:5000/api/orders/my-orders", {
+    fetch(`${API}/api/orders/my-orders`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -26,16 +28,16 @@ export default function MyOrders() {
       .catch((err) => console.error(err));
   }, []);
 
-return (
-  <div className="orders-page">
+  return (
+    <div className="orders-page">
 
-    <div className="back-wrapper">
-      <button className="back-home-btn" onClick={() => navigate("/")}>
-        ⬅ Back to Home
-      </button>
-    </div>
+      <div className="back-wrapper">
+        <button className="back-home-btn" onClick={() => navigate("/")}>
+          ⬅ Back to Home
+        </button>
+      </div>
 
-    <h1>My Orders</h1>
+      <h1>My Orders</h1>
 
       {orders.length === 0 && <p>No orders found.</p>}
 
