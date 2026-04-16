@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import API from "../config/api"; // ← تم تصحيح المسار
+import API from "../../config/api";
 import "./ProDetails.css";
 import { CartContext } from "../context/CartContext";
 
