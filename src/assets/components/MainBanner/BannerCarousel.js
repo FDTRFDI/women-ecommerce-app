@@ -2,18 +2,17 @@ import React, { useState, useEffect } from "react";
 import BannerSlide from "./BannerSlide";
 import img1 from "../img/background/4.png";
 
+// 👇 moved خارج الكومبوننت عشان dependency warning
+const slides = [
+  {
+    img: img1,
+    title: "Glow Like Never Before",
+    subtitle: "Discover premium beauty products",
+    btn: "Shop Makeup",
+  },
+];
 
 function BannerCarousel() {
-  const slides = [
-    {
-      img: img1,
-      title: "Glow Like Never Before",
-      subtitle: "Discover premium beauty products",
-      btn: "Shop Makeup",
-    },
-   
-  ];
-
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {

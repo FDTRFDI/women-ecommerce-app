@@ -15,7 +15,7 @@ const stripePromise = loadStripe(
   "pk_test_51T2GkQRV7UWVJc5vPmDUn7CJc07RVWn246msyB47JlMmvLcLPsL3e3Bb7qE62pnngNLCJQgDZIHjVWO83opI1Jzo00GForbZFg"
 );
 
-const API = "https://backend-women-ecommerce-2.onrender.com";
+const API = "https://backend-women-ecommerce.onrender.com";
 
 const CheckoutForm = ({ total }) => {
   const stripe = useStripe();

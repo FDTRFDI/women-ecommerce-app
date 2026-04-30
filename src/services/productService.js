@@ -1,4 +1,4 @@
-const API_URL = "https://backend-women-ecommerce-2.onrender.com/api/products";
+const API_URL = "https://backend-women-ecommerce.onrender.com";
 
 export const getProducts = async () => {
   try {

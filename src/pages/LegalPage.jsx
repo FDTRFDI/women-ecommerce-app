@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-const API = "https://backend-women-ecommerce-2.onrender.com";
+const API = "https://backend-women-ecommerce.onrender.com";
 
 export default function LegalPage() {
   const { type } = useParams();

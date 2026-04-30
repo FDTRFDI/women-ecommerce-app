@@ -3,7 +3,7 @@ import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "./checkout.css";
 
-const API = "https://backend-women-ecommerce-2.onrender.com";
+const API = "https://backend-women-ecommerce.onrender.com";
 
 const Checkout = () => {
   const { cart, clearCart } = useContext(CartContext);

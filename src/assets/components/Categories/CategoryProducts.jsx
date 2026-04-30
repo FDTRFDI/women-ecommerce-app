@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./CategoryProducts.css";
 import { CartContext } from "../../../context/CartContext";
 
-const API = "https://backend-women-ecommerce-2.onrender.com";
+const API = "https://backend-women-ecommerce.onrender.com";
 
 function CategoryProducts() {
   const { id } = useParams();

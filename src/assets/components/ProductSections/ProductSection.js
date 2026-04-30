@@ -3,8 +3,7 @@ import { CartContext } from "../../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "./ProductSections.css";
 
-const API = "https://backend-women-ecommerce-2.onrender.com";
-
+const API = "https://backend-women-ecommerce.onrender.com";
 const ProductSection = ({ title, products = [] }) => {
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
