@@ -45,6 +45,11 @@ const ProDetails = () => {
     images.push(`${API}${product.main_image}`);
   }
 
+  // Fallback image
+  if (images.length === 0) {
+    images.push("https://via.placeholder.com/600x800?text=No+Image");
+  }
+
   const nextImage = () =>
     setCurrent((prev) => (prev + 1) % images.length);
 
@@ -68,13 +73,11 @@ const ProDetails = () => {
         </div>
 
         <div className="main-image">
-          {images.length > 0 && (
-            <>
-              <button className="nav-btn left" onClick={prevImage}>‹</button>
-              <img src={images[current]} alt={product.title} />
-              <button className="nav-btn right" onClick={nextImage}>›</button>
-            </>
-          )}
+          <>
+            <button className="nav-btn left" onClick={prevImage}>‹</button>
+            <img src={images[current]} alt={product.title} />
+            <button className="nav-btn right" onClick={nextImage}>›</button>
+          </>
         </div>
       </div>
 
