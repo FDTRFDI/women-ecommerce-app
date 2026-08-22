@@ -28,8 +28,11 @@ const ProductDetails = () => {
 
   if (!product) return <h2 className="loading">Loading...</h2>;
 
-  const images =
-    product.images && product.images.length > 0
+  // -----------------------------
+  // BUILD IMAGES WITH FULL FALLBACK
+  // -----------------------------
+  let images =
+    product.images && Array.isArray(product.images) && product.images.length > 0
       ? product.images.map(img => `${API}${img}`)
       : product.gallery
       ? (Array.isArray(product.gallery)
@@ -41,9 +44,9 @@ const ProductDetails = () => {
       ? [`${API}${product.image}`]
       : [];
 
-  // Fallback image
-  if (images.length === 0) {
-    images.push("https://via.placeholder.com/600x800?text=No+Image");
+  // FINAL FALLBACK (ALWAYS SHOW IMAGE)
+  if (!Array.isArray(images) || images.length === 0) {
+    images = ["https://via.placeholder.com/600x800?text=No+Image"];
   }
 
   const nextImage = () =>
@@ -55,6 +58,7 @@ const ProductDetails = () => {
   return (
     <div className="product-details">
 
+      {/* LEFT SIDE — GALLERY */}
       <div className="gallery">
         <div className="thumbs">
           {images.map((img, i) => (
@@ -77,6 +81,7 @@ const ProductDetails = () => {
         </div>
       </div>
 
+      {/* RIGHT SIDE — INFO */}
       <div className="info">
         <h2>{product.name}</h2>
         <h3 className="price">{product.price} AED</h3>
@@ -89,6 +94,7 @@ const ProductDetails = () => {
           <p>Estimated delivery: 5–7 business days</p>
         </div>
 
+        {/* COLORS */}
         {product.colors && product.colors.length > 0 && (
           <div className="variants-box">
             <h3>Variations</h3>
@@ -106,6 +112,7 @@ const ProductDetails = () => {
           </div>
         )}
 
+        {/* ACTION BUTTONS */}
         <div className="actions">
           <button
             className="cart-btn"

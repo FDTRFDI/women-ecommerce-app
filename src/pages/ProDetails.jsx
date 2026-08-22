@@ -29,11 +29,15 @@ const ProDetails = () => {
 
   if (!product) return <h2 className="loading">Loading...</h2>;
 
-  const images = [];
+  // -----------------------------
+  // BUILD IMAGES WITH FULL FALLBACK
+  // -----------------------------
+  let images = [];
 
   if (product.images && Array.isArray(product.images) && product.images.length > 0) {
     product.images.forEach(img => images.push(`${API}${img}`));
-  } else if (product.gallery) {
+  } 
+  else if (product.gallery) {
     const galleryImages = Array.isArray(product.gallery)
       ? product.gallery
       : JSON.parse(product.gallery);
@@ -41,13 +45,14 @@ const ProDetails = () => {
     galleryImages.forEach((img) => {
       images.push(`${API}${img}`);
     });
-  } else if (product.main_image) {
+  } 
+  else if (product.main_image) {
     images.push(`${API}${product.main_image}`);
   }
 
-  // Fallback image
-  if (images.length === 0) {
-    images.push("https://via.placeholder.com/600x800?text=No+Image");
+  // FINAL FALLBACK (ALWAYS SHOW IMAGE)
+  if (!Array.isArray(images) || images.length === 0) {
+    images = ["https://via.placeholder.com/600x800?text=No+Image"];
   }
 
   const nextImage = () =>
@@ -59,6 +64,7 @@ const ProDetails = () => {
   return (
     <div className="ProDetails">
 
+      {/* LEFT SIDE — GALLERY */}
       <div className="gallery">
         <div className="thumbs">
           {images.map((img, i) => (
@@ -81,6 +87,7 @@ const ProDetails = () => {
         </div>
       </div>
 
+      {/* RIGHT SIDE — INFO */}
       <div className="info">
         <h2>{product.title}</h2>
         <h3 className="price">{product.price} AED</h3>
@@ -90,6 +97,7 @@ const ProDetails = () => {
           <p>Estimated delivery: 5–7 business days</p>
         </div>
 
+        {/* COLORS */}
         {product.colors && product.colors.length > 0 && (
           <div className="variants-box">
             <h3>Variations</h3>
@@ -107,6 +115,7 @@ const ProDetails = () => {
           </div>
         )}
 
+        {/* ACTION BUTTONS */}
         <div className="actions">
           <button
             className="cart-btn"
