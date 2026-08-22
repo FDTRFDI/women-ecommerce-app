@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../../utils/axios";
 import "./admin.css";
 
-const API = "https://backend-women-ecommerce-2.onrender.com";
+const API = "backend-women-ecommerce.onrender.com";
 
 const ProductManager = () => {
   const emptyForm = {

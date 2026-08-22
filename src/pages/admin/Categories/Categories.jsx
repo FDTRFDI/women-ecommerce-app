@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../utils/axios";
 import "./Categories.css";
 
-const API = "https://backend-women-ecommerce-2.onrender.com";
+const API = "backend-women-ecommerce.onrender.com";
 
 const Categories = () => {
   const navigate = useNavigate();

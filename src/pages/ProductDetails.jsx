@@ -11,35 +11,65 @@ const ProductDetails = () => {
 
   const [product, setProduct] = useState(null);
   const [current, setCurrent] = useState(0);
-  const [qty, setQty] = useState(1);
 
   useEffect(() => {
+    setProduct(null);
+    setCurrent(0);
+
     fetch(`${API}/api/products/${id}`)
-      .then(res => res.json())
-      .then(data => setProduct(data))
-      .catch(err => console.error(err));
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error: ${res.status}`);
+        }
+
+        return res.json();
+      })
+      .then((data) => {
+        console.log("PRODUCT DETAILS:", data);
+        setProduct(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching product:", err);
+      });
   }, [id]);
 
-  if (!product) return <h2 className="loading">Loading...</h2>;
+  if (!product) {
+    return <h2 className="loading">Loading...</h2>;
+  }
 
-  const images =
-    product.images && product.images.length > 0
-      ? product.images.map(img => `${API}${img}`)
-      : product.image
-      ? [`${API}${product.image}`]
-      : [];
+  /*
+    Main image + gallery images
+  */
+  const images = [
+    ...(product.image ? [`${API}${product.image}`] : []),
+    ...(Array.isArray(product.images)
+      ? product.images.map((img) => `${API}${img}`)
+      : []),
+  ];
 
-  const nextImage = () =>
+  const nextImage = () => {
+    if (images.length === 0) return;
+
     setCurrent((prev) => (prev + 1) % images.length);
+  };
 
-  const prevImage = () =>
-    setCurrent((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  const prevImage = () => {
+    if (images.length === 0) return;
+
+    setCurrent((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
 
   return (
     <div className="product-details">
 
-      {/* LEFT SIDE — GALLERY */}
+      {/* =========================
+          LEFT SIDE - GALLERY
+      ========================= */}
+
       <div className="gallery">
+
         <div className="thumbs">
           {images.map((img, i) => (
             <img
@@ -47,67 +77,111 @@ const ProductDetails = () => {
               src={img}
               className={current === i ? "active" : ""}
               onClick={() => setCurrent(i)}
-              alt=""
+              alt={`${product.name} ${i + 1}`}
             />
           ))}
         </div>
 
         <div className="main-image">
-          {images.length > 0 && (
+
+          {images.length > 0 ? (
             <>
-              <button className="nav-btn left" onClick={prevImage}>‹</button>
-              <img src={images[current]} alt={product.name} />
-              <button className="nav-btn right" onClick={nextImage}>›</button>
+              <button
+                className="nav-btn left"
+                onClick={prevImage}
+                type="button"
+              >
+                ‹
+              </button>
+
+              <img
+                src={images[current]}
+                alt={product.name}
+              />
+
+              <button
+                className="nav-btn right"
+                onClick={nextImage}
+                type="button"
+              >
+                ›
+              </button>
             </>
+          ) : (
+            <p>No image available</p>
           )}
+
         </div>
+
       </div>
 
-      {/* RIGHT SIDE — MAIN INFO */}
+      {/* =========================
+          RIGHT SIDE - PRODUCT INFO
+      ========================= */}
+
       <div className="info">
 
         <h2>{product.name}</h2>
 
-        <h3 className="price">{product.price} AED </h3>
+        <h3 className="price">
+          {product.price} AED
+        </h3>
 
         <p className="desc">
           {product.description || "High quality product."}
         </p>
 
-        {/* SHIPPING BOX */}
+        {/* SHIPPING */}
+
         <div className="shipping-box">
-          <p>Estimated delivery: 5–7 business days</p>
+          <p>
+            Estimated delivery: 5–7 business days
+          </p>
         </div>
 
-        {/* VARIANTS */}
-        <div className="variants-box">
-          <h3>Variations</h3>
+        {/* VARIATIONS */}
 
-          {product.colors && product.colors.length > 0 && (
-            <div className="variant-row">
-              <span>Colors:</span>
-              <div className="variant-options">
-                {product.colors.map((c, i) => (
-                  <div key={i} className="variant-item">
-                    {c}
-                  </div>
-                ))}
+        {product.colors &&
+          product.colors.length > 0 && (
+            <div className="variants-box">
+
+              <h3>Variations</h3>
+
+              <div className="variant-row">
+
+                <span>Colors:</span>
+
+                <div className="variant-options">
+
+                  {product.colors.map((color, i) => (
+                    <div
+                      key={i}
+                      className="variant-item"
+                    >
+                      {color}
+                    </div>
+                  ))}
+
+                </div>
+
               </div>
+
             </div>
           )}
-        </div>
 
-        {/* ACTION BUTTONS */}
+        {/* ACTIONS */}
+
         <div className="actions">
 
           <button
             className="cart-btn"
+            type="button"
             onClick={() =>
               addToCart({
                 id: product.id,
                 name: product.name,
                 price: product.price,
-                image: images[0],
+                image: images[0] || "",
               })
             }
           >
@@ -115,7 +189,7 @@ const ProductDetails = () => {
           </button>
 
           <a
-            href="https://wa.me/+971545234489"
+            href="https://wa.me/971545234489"
             target="_blank"
             rel="noopener noreferrer"
             className="chat-btn"
@@ -126,6 +200,7 @@ const ProductDetails = () => {
         </div>
 
       </div>
+
     </div>
   );
 };

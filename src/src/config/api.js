@@ -1,2 +1,3 @@
-const API = "https://backend-women-ecommerce-2.onrender.com";
+const API = "http://localhost:5000";
+
 export default API;

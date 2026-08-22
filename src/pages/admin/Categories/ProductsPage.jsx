@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./ProductsPage.css";
 
-const API = "https://backend-women-ecommerce-2.onrender.com";
+const API = "backend-women-ecommerce.onrender.com";
 
 function ProductsPage() {
   const [categories, setCategories] = useState([]);
