@@ -1,12 +1,30 @@
-import { Outlet, Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 const AdminRoute = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  let user = null;
 
-  if (!user || user.role !== "admin") {
-    return <Navigate to="/" />;
+  try {
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser) {
+      user = JSON.parse(savedUser);
+    }
+  } catch (error) {
+    console.error("Invalid user data:", error);
+    localStorage.removeItem("user");
   }
 
+  // المستخدم غير مسجل الدخول
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // المستخدم ليس Admin
+  if (user.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+
+  // Admin مسجل الدخول
   return <Outlet />;
 };
 

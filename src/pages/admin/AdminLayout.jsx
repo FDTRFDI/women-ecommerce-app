@@ -1,12 +1,19 @@
 import AdminNavbar from "./AdminNavbar";
 
-export default function AdminLayout({ children }) {
+const AdminLayout = ({ children }) => {
   return (
-    <div style={{ display: "flex" }}>
+    <div className="admin-layout">
+
+      {/* Sidebar / Navbar */}
       <AdminNavbar />
-      <div style={{ flex: 1, padding: "20px" }}>
+
+      {/* Main Content */}
+      <main className="admin-content">
         {children}
-      </div>
+      </main>
+
     </div>
   );
-}
+};
+
+export default AdminLayout;
