@@ -1,63 +1,282 @@
-/* ============================
+/* =========================================================
+   ADMIN PANEL - GENERAL
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  background: #f7f7f7;
+}
+
+/* =========================================================
+   ADMIN NAVBAR / SIDEBAR
+========================================================= */
+
+.admin-navbar {
+  width: 240px;
+  min-height: 100vh;
+  background: #111;
+  color: #fff;
+  padding: 25px 15px;
+
+  display: flex;
+  flex-direction: column;
+
+  position: sticky;
+  top: 0;
+  left: 0;
+
+  flex-shrink: 0;
+}
+
+.admin-brand {
+  padding: 0 10px 25px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 25px;
+}
+
+.admin-brand h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: #fff;
+}
+
+.admin-brand p {
+  margin: 0;
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* =========================================================
+   NAVIGATION LINKS
+========================================================= */
+
+.admin-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-links a {
+  display: block;
+  padding: 12px 14px;
+
+  color: #ddd;
+  text-decoration: none;
+
+  border-radius: 7px;
+
+  font-size: 15px;
+
+  transition: 0.2s ease;
+}
+
+.admin-links a:hover {
+  background: #292929;
+  color: #fff;
+}
+
+.admin-links a.active {
+  background: #fff;
+  color: #111;
+}
+
+/* =========================================================
+   ADMIN ACTIONS
+========================================================= */
+
+.admin-actions {
+  margin-top: auto;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #333;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-actions a {
+  display: block;
+
+  padding: 11px 14px;
+
+  color: #ddd;
+  text-decoration: none;
+
+  border-radius: 7px;
+
+  font-size: 14px;
+}
+
+.admin-actions a:hover {
+  background: #292929;
+  color: #fff;
+}
+
+.admin-actions button {
+  width: 100%;
+
+  padding: 11px 14px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: #dc3545;
+  color: #fff;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.admin-actions button:hover {
+  background: #b02a37;
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.admin-content {
+  flex: 1;
+  min-width: 0;
+
+  padding: 30px;
+}
+
+/* =========================================================
    GENERAL LAYOUT
-============================ */
+========================================================= */
+
 .admin-dashboard-container {
   max-width: 1100px;
-  margin: 40px auto;
+
+  margin: 0 auto;
+
   padding: 20px;
+
   font-family: Arial, sans-serif;
 }
 
 .admin-title {
   text-align: center;
+
   margin-bottom: 30px;
+
   font-size: 32px;
+
   font-weight: bold;
+
+  color: #111;
 }
 
-/* ============================
+.admin-section-title {
+  margin-bottom: 20px;
+
+  font-size: 22px;
+
+  font-weight: bold;
+
+  color: #111;
+}
+
+/* =========================================================
    FORM STYLING
-============================ */
+========================================================= */
+
 .admin-form {
   background: #fff;
+
   padding: 25px;
+
   border-radius: 10px;
+
   box-shadow: 0 0 10px #ddd;
+
   margin-bottom: 40px;
+}
+
+.admin-form h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
 }
 
 .admin-form input,
 .admin-form textarea,
 .admin-form select {
   width: 100%;
+
   padding: 12px;
+
   margin-bottom: 15px;
+
   border-radius: 6px;
+
   border: 1px solid #ccc;
+
   font-size: 15px;
+
+  font-family: Arial, sans-serif;
+}
+
+.admin-form input:focus,
+.admin-form textarea:focus,
+.admin-form select:focus {
+  outline: none;
+
+  border-color: #007bff;
+
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
 }
 
 .admin-form textarea {
   height: 120px;
+
   resize: vertical;
 }
 
-.admin-section-title {
-  margin-bottom: 20px;
-  font-size: 22px;
+.admin-form label {
+  display: block;
+
+  margin-bottom: 7px;
+
   font-weight: bold;
+
+  color: #333;
 }
 
-/* ============================
+/* =========================================================
    BUTTONS
-============================ */
+========================================================= */
+
 .btn {
   padding: 10px 18px;
+
   border: none;
+
   border-radius: 6px;
+
   cursor: pointer;
+
   font-size: 15px;
+
   color: #fff;
+
+  transition: 0.2s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+
+  transform: translateY(-1px);
 }
 
 .btn.primary {
@@ -74,61 +293,248 @@
 
 .btn.small {
   padding: 6px 12px;
+
   font-size: 13px;
 }
 
-/* ============================
+/* =========================================================
    TABLE STYLING
-============================ */
+========================================================= */
+
+.admin-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+
+  background: #fff;
+
+  border-radius: 10px;
+
+  box-shadow: 0 0 10px #ddd;
+}
+
 .admin-table {
   width: 100%;
+
   border-collapse: collapse;
+
   margin-top: 20px;
+
+  background: #fff;
 }
 
 .admin-table th,
 .admin-table td {
   padding: 12px;
+
   border-bottom: 1px solid #ddd;
+
   text-align: left;
 }
 
 .admin-table th {
   background: #f5f5f5;
+
   font-weight: bold;
+
+  color: #222;
 }
 
 .admin-table tr:hover {
   background: #fafafa;
 }
 
-/* ============================
-   TAGS (Colors & Sizes)
-============================ */
+.admin-table img {
+  width: 60px;
+
+  height: 60px;
+
+  object-fit: cover;
+
+  border-radius: 6px;
+}
+
+/* =========================================================
+   ACTION BUTTONS IN TABLE
+========================================================= */
+
+.admin-table .btn {
+  margin-right: 7px;
+}
+
+.admin-table .btn:last-child {
+  margin-right: 0;
+}
+
+/* =========================================================
+   TAGS - COLORS / SIZES
+========================================================= */
+
 .tag-list {
   display: flex;
+
   flex-wrap: wrap;
+
   gap: 8px;
+
   margin-bottom: 15px;
 }
 
 .tag {
   background: #007bff;
+
   color: #fff;
+
   padding: 6px 12px;
+
   border-radius: 20px;
+
   font-size: 13px;
 }
 
-/* ============================
-   ROWS
-============================ */
+/* =========================================================
+   FORM ROWS
+========================================================= */
+
 .admin-forms-row {
   display: flex;
+
   gap: 10px;
+
   margin-bottom: 15px;
 }
 
 .admin-forms-row input {
   flex: 1;
+
+  margin-bottom: 0;
+}
+
+.admin-forms-row button {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   DASHBOARD CARDS
+========================================================= */
+
+.admin-cards {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 20px;
+
+  margin-bottom: 30px;
+}
+
+.admin-card {
+  background: #fff;
+
+  padding: 25px;
+
+  border-radius: 10px;
+
+  box-shadow: 0 0 10px #ddd;
+
+  text-align: center;
+}
+
+.admin-card h3 {
+  margin: 0 0 10px;
+
+  font-size: 16px;
+
+  color: #666;
+}
+
+.admin-card p {
+  margin: 0;
+
+  font-size: 30px;
+
+  font-weight: bold;
+
+  color: #111;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .admin-navbar {
+    width: 200px;
+  }
+
+  .admin-content {
+    padding: 20px;
+  }
+
+  .admin-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+@media (max-width: 650px) {
+
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .admin-navbar {
+    width: 100%;
+
+    min-height: auto;
+
+    position: relative;
+
+    padding: 15px;
+  }
+
+  .admin-links {
+    flex-direction: row;
+
+    flex-wrap: wrap;
+  }
+
+  .admin-links a {
+    padding: 9px 10px;
+  }
+
+  .admin-actions {
+    margin-top: 15px;
+
+    flex-direction: row;
+
+    align-items: center;
+  }
+
+  .admin-actions a,
+  .admin-actions button {
+    flex: 1;
+  }
+
+  .admin-content {
+    padding: 10px;
+  }
+
+  .admin-dashboard-container {
+    padding: 10px;
+  }
+
+  .admin-title {
+    font-size: 25px;
+  }
+
+  .admin-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-forms-row {
+    flex-direction: column;
+  }
+
 }

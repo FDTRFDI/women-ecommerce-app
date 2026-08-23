@@ -1,114 +1,59 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./admin.css";
 
 const AdminNavbar = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-
-  const isActive = (path) => {
-    if (path === "/admin") {
-      return location.pathname === "/admin";
-    }
-
-    return location.pathname.startsWith(path);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-
-    navigate("/login", { replace: true });
+    navigate("/login");
   };
 
   return (
-    <aside className="admin-navbar">
+    <nav className="admin-navbar">
 
-      {/* Logo / Title */}
-      <div className="admin-navbar-header">
+      <div className="admin-brand">
         <h2>Admin Panel</h2>
         <p>Women E-Commerce</p>
       </div>
 
-      {/* Navigation */}
-      <nav className="admin-nav">
+      <div className="admin-links">
 
-        <Link
-          to="/admin"
-          className={isActive("/admin") ? "admin-link active" : "admin-link"}
-        >
-          <span>📊</span>
-          Dashboard
+        <Link to="/admin">
+          📊 Dashboard
         </Link>
 
-        <Link
-          to="/admin/products"
-          className={
-            isActive("/admin/products")
-              ? "admin-link active"
-              : "admin-link"
-          }
-        >
-          <span>🛍️</span>
-          Products
+        <Link to="/admin/products">
+          👜 Products
         </Link>
 
-        <Link
-          to="/admin/categories"
-          className={
-            isActive("/admin/categories")
-              ? "admin-link active"
-              : "admin-link"
-          }
-        >
-          <span>📂</span>
-          Categories
+        <Link to="/admin/categories">
+          📁 Categories
         </Link>
 
-        <Link
-          to="/admin/orders"
-          className={
-            isActive("/admin/orders")
-              ? "admin-link active"
-              : "admin-link"
-          }
-        >
-          <span>📦</span>
-          Orders
+        <Link to="/admin/orders">
+          📦 Orders
         </Link>
 
-        <Link
-          to="/admin/users"
-          className={
-            isActive("/admin/users")
-              ? "admin-link active"
-              : "admin-link"
-          }
-        >
-          <span>👥</span>
-          Users
+        <Link to="/admin/users">
+          👥 Users
         </Link>
 
-      </nav>
+      </div>
 
-      {/* Bottom */}
-      <div className="admin-navbar-footer">
+      <div className="admin-actions">
 
-        <Link to="/" className="admin-link">
-          <span>🏠</span>
-          Back to Store
+        <Link to="/">
+          🏠 Back to Store
         </Link>
 
-        <button
-          type="button"
-          className="admin-logout"
-          onClick={handleLogout}
-        >
-          <span>🚪</span>
-          Logout
+        <button onClick={handleLogout}>
+          🚪 Logout
         </button>
 
       </div>
 
-    </aside>
+    </nav>
   );
 };
 
