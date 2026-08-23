@@ -16,28 +16,19 @@ const ProDetails = () => {
   useEffect(() => {
     fetch(`${API}/api/category-products/product/${id}`)
       .then((res) => res.json())
-      .then((data) => {
-        const productData =
-          data.data ? data.data :
-          Array.isArray(data) ? data[0] :
-          data;
-
-        setProduct(productData);
-      })
+      .then((data) => setProduct(data))
       .catch((err) => console.error(err));
   }, [id]);
 
   if (!product) return <h2 className="loading">Loading...</h2>;
 
-  // -----------------------------
-  // BUILD IMAGES WITH FULL FALLBACK
-  // -----------------------------
-  let images = [];
+  const images = [];
 
-  if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-    product.images.forEach(img => images.push(`${API}${img}`));
-  } 
-  else if (product.gallery) {
+  if (product.main_image) {
+    images.push(`${API}${product.main_image}`);
+  }
+
+  if (product.gallery) {
     const galleryImages = Array.isArray(product.gallery)
       ? product.gallery
       : JSON.parse(product.gallery);
@@ -45,14 +36,6 @@ const ProDetails = () => {
     galleryImages.forEach((img) => {
       images.push(`${API}${img}`);
     });
-  } 
-  else if (product.main_image) {
-    images.push(`${API}${product.main_image}`);
-  }
-
-  // FINAL FALLBACK (ALWAYS SHOW IMAGE)
-  if (!Array.isArray(images) || images.length === 0) {
-    images = ["https://via.placeholder.com/600x800?text=No+Image"];
   }
 
   const nextImage = () =>
@@ -64,7 +47,6 @@ const ProDetails = () => {
   return (
     <div className="ProDetails">
 
-      {/* LEFT SIDE — GALLERY */}
       <div className="gallery">
         <div className="thumbs">
           {images.map((img, i) => (
@@ -79,15 +61,16 @@ const ProDetails = () => {
         </div>
 
         <div className="main-image">
-          <>
-            <button className="nav-btn left" onClick={prevImage}>‹</button>
-            <img src={images[current]} alt={product.title} />
-            <button className="nav-btn right" onClick={nextImage}>›</button>
-          </>
+          {images.length > 0 && (
+            <>
+              <button className="nav-btn left" onClick={prevImage}>‹</button>
+              <img src={images[current]} alt={product.title} />
+              <button className="nav-btn right" onClick={nextImage}>›</button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* RIGHT SIDE — INFO */}
       <div className="info">
         <h2>{product.title}</h2>
         <h3 className="price">{product.price} AED</h3>
@@ -97,7 +80,6 @@ const ProDetails = () => {
           <p>Estimated delivery: 5–7 business days</p>
         </div>
 
-        {/* COLORS */}
         {product.colors && product.colors.length > 0 && (
           <div className="variants-box">
             <h3>Variations</h3>
@@ -115,8 +97,8 @@ const ProDetails = () => {
           </div>
         )}
 
-        {/* ACTION BUTTONS */}
         <div className="actions">
+
           <button
             className="cart-btn"
             onClick={() =>
@@ -139,7 +121,9 @@ const ProDetails = () => {
           >
             Chat on WhatsApp
           </a>
+
         </div>
+
       </div>
     </div>
   );

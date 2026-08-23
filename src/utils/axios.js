@@ -1,14 +1,18 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "https://backend-women-ecommerce.onrender.com",
+  baseURL: "https://backend-women-ecommerce.onrender.com/api",
 });
 
 instance.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const storedUser = localStorage.getItem("user");
 
-  if (user?.token) {
-    config.headers.Authorization = `Bearer ${user.token}`;
+  if (storedUser) {
+    const user = JSON.parse(storedUser);
+
+    if (user?.token) {
+      config.headers.Authorization = `Bearer ${user.token}`;
+    }
   }
 
   return config;

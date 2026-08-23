@@ -5,11 +5,19 @@ import "./login.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "" });
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleLogin = async (e) => {
@@ -17,9 +25,13 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post("/api/auth/login", formData);
+      // Login API
+      // axios.js already has /api in baseURL
+      const { data } = await axios.post("/auth/login", formData);
 
-      // 🔹 حفظ المستخدم والتوكن تحت مفتاح واحد
+      console.log("LOGIN RESPONSE:", data);
+
+      // Save user + token
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -33,13 +45,22 @@ const Login = () => {
 
       alert("Login Successful ✅");
 
-      // 🔹 تحويل حسب الصلاحية
-      if (data.role === "admin") navigate("/admin");
-      else navigate("/");
-
+      // Redirect according to role
+      if (data.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || "Server connection error");
+      console.error("LOGIN ERROR:", error);
+
+      console.error("STATUS:", error.response?.status);
+      console.error("DATA:", error.response?.data);
+
+      alert(
+        error.response?.data?.message ||
+          "Server connection error"
+      );
     } finally {
       setLoading(false);
     }
@@ -48,10 +69,13 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-box">
+
         <h1>Welcome Back</h1>
+
         <p>Login to your account</p>
 
         <form onSubmit={handleLogin}>
+
           <input
             type="email"
             name="email"
@@ -70,17 +94,28 @@ const Login = () => {
             required
           />
 
-          <button className="login-btn" disabled={loading}>
+          <button
+            type="submit"
+            className="login-btn"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
+
         </form>
 
         <p className="login-footer">
           Don’t have an account?{" "}
-          <Link to="/register" className="signup-link">
+
+          <Link
+            to="/register"
+            className="signup-link"
+          >
             Sign Up
           </Link>
+
         </p>
+
       </div>
     </div>
   );
