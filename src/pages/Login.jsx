@@ -13,19 +13,13 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
-  // =========================
-  // Handle Input Change
-  // =========================
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
-    }));
+    });
   };
 
-  // =========================
-  // Handle Login
-  // =========================
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -34,18 +28,23 @@ const Login = () => {
     setLoading(true);
 
     try {
-      console.log(
-        "LOGIN REQUEST:",
-        formData.email
-      );
+      console.log("LOGIN REQUEST:", {
+        email: formData.email,
+      });
 
-      // IMPORTANT:
-      // axios.js baseURL:
-      // https://backend-women-ecommerce.onrender.com
-      //
-      // لذلك نضيف /api هنا
+      /*
+       * axios.js already has:
+       *
+       * https://backend-women-ecommerce.onrender.com/api
+       *
+       * Therefore this request becomes:
+       *
+       * POST
+       * https://backend-women-ecommerce.onrender.com/api/auth/login
+       */
+
       const response = await axios.post(
-        "/api/auth/login",
+        "/auth/login",
         {
           email: formData.email.trim(),
           password: formData.password,
@@ -54,37 +53,26 @@ const Login = () => {
 
       const data = response.data;
 
-      console.log(
-        "LOGIN RESPONSE:",
-        data
-      );
+      console.log("LOGIN RESPONSE:", data);
 
-      // =========================
-      // Check Token
-      // =========================
+      /*
+       * Make sure token exists
+       */
       if (!data?.token) {
-        console.error(
-          "Login response does not contain token:",
-          data
+        console.error("No token returned from server:", data);
+
+        alert(
+          data?.message ||
+            "Login failed: server did not return a token."
         );
 
-        throw new Error(
-          "Login successful but token was not returned by server."
-        );
+        return;
       }
 
-      // =========================
-      // Save Token
-      // =========================
-      localStorage.setItem(
-        "token",
-        data.token
-      );
-
-      // =========================
-      // Save User
-      // =========================
-      const user = {
+      /*
+       * Save logged-in user
+       */
+      const userData = {
         id: data.id,
         name: data.name,
         email: data.email,
@@ -94,22 +82,16 @@ const Login = () => {
 
       localStorage.setItem(
         "user",
-        JSON.stringify(user)
+        JSON.stringify(userData)
       );
 
-      console.log(
-        "USER SAVED:",
-        user
-      );
+      console.log("USER SAVED:", userData);
 
-      // =========================
-      // Success
-      // =========================
       alert("Login Successful ✅");
 
-      // =========================
-      // Redirect
-      // =========================
+      /*
+       * Redirect according to user role
+       */
       if (data.role === "admin") {
         navigate("/admin", {
           replace: true,
@@ -119,11 +101,9 @@ const Login = () => {
           replace: true,
         });
       }
+
     } catch (error) {
-      console.error(
-        "LOGIN ERROR:",
-        error
-      );
+      console.error("LOGIN ERROR:", error);
 
       console.error(
         "STATUS:",
@@ -135,38 +115,44 @@ const Login = () => {
         error.response?.data
       );
 
-      let message =
-        "Server connection error";
+      let message = "Server connection error";
 
       if (error.response?.data?.message) {
+        message = error.response.data.message;
+      } else if (error.response?.status === 404) {
         message =
-          error.response.data.message;
-      } else if (error.message) {
-        message = error.message;
+          "Login endpoint not found. Check backend API route.";
+      } else if (error.response?.status === 400) {
+        message =
+          error.response.data?.message ||
+          "Invalid email or password.";
+      } else if (error.response?.status === 401) {
+        message =
+          error.response.data?.message ||
+          "Invalid email or password.";
+      } else if (error.response?.status >= 500) {
+        message =
+          "Backend server error. Please try again later.";
       }
 
       alert(message);
+
     } finally {
       setLoading(false);
     }
   };
 
-  // =========================
-  // UI
-  // =========================
   return (
     <div className="login-container">
+
       <div className="login-box">
 
         <h1>Welcome Back</h1>
 
-        <p>
-          Login to your account
-        </p>
+        <p>Login to your account</p>
 
         <form onSubmit={handleLogin}>
 
-          {/* Email */}
           <input
             type="email"
             name="email"
@@ -177,7 +163,6 @@ const Login = () => {
             required
           />
 
-          {/* Password */}
           <input
             type="password"
             name="password"
@@ -188,7 +173,6 @@ const Login = () => {
             required
           />
 
-          {/* Login Button */}
           <button
             type="submit"
             className="login-btn"
@@ -201,8 +185,8 @@ const Login = () => {
 
         </form>
 
-        {/* Register */}
         <p className="login-footer">
+
           Don’t have an account?{" "}
 
           <Link
@@ -211,9 +195,11 @@ const Login = () => {
           >
             Sign Up
           </Link>
+
         </p>
 
       </div>
+
     </div>
   );
 };
