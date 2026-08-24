@@ -1,7 +1,7 @@
 import React, {
   useState,
-  useEffect,
   useContext,
+  useEffect,
 } from "react";
 
 import {
@@ -9,12 +9,12 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import API from "../src/config/api";
+import { CartContext } from "../context/CartContext";
 
 import "./ProDetails.css";
 
-import { CartContext } from "../context/CartContext";
-
+const API =
+  "https://backend-women-ecommerce.onrender.com";
 
 const ProDetails = () => {
 
@@ -22,42 +22,27 @@ const ProDetails = () => {
 
   const navigate = useNavigate();
 
-  const { addToCart } = useContext(CartContext);
+  const { addToCart } =
+    useContext(CartContext);
 
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] =
+    useState(null);
 
-  const [current, setCurrent] = useState(0);
+  const [images, setImages] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [current, setCurrent] =
+    useState(0);
 
-  const [error, setError] = useState("");
+  const [loading, setLoading] =
+    useState(true);
 
+  const [error, setError] =
+    useState("");
 
-  // ======================================
-  // IMAGE URL
-  // ======================================
-
-  const getImageUrl = (path) => {
-
-    if (!path) {
-      return "";
-    }
-
-    if (path.startsWith("http")) {
-      return path;
-    }
-
-    if (path.startsWith("/")) {
-      return `${API}${path}`;
-    }
-
-    return `${API}/${path}`;
-  };
-
-
-  // ======================================
-  // GET CATEGORY PRODUCT
-  // ======================================
+  // ==========================================
+  // LOAD SINGLE CATEGORY PRODUCT
+  // ==========================================
 
   useEffect(() => {
 
@@ -66,17 +51,26 @@ const ProDetails = () => {
       try {
 
         setLoading(true);
-
         setError("");
+
+        console.log(
+          "Loading category product ID:",
+          id
+        );
 
         const response = await fetch(
           `${API}/api/category-products/product/${id}`
         );
 
+        console.log(
+          "Product response status:",
+          response.status
+        );
+
         if (!response.ok) {
 
           throw new Error(
-            `Product request failed: ${response.status}`
+            `Product not found (${response.status})`
           );
 
         }
@@ -84,26 +78,106 @@ const ProDetails = () => {
         const data = await response.json();
 
         console.log(
-          "CATEGORY PRODUCT DETAILS:",
+          "Product data:",
           data
         );
 
+        if (!data || !data.id) {
+
+          throw new Error(
+            "Invalid product data"
+          );
+
+        }
+
         setProduct(data);
+
+        // ======================================
+        // BUILD IMAGES
+        // ======================================
+
+        const productImages = [];
+
+        // MAIN IMAGE
+        if (data.main_image) {
+
+          productImages.push(
+            normalizeImage(data.main_image)
+          );
+
+        }
+
+        // GALLERY
+        if (data.gallery) {
+
+          let gallery = [];
+
+          try {
+
+            gallery = Array.isArray(data.gallery)
+              ? data.gallery
+              : JSON.parse(data.gallery);
+
+          } catch (error) {
+
+            console.error(
+              "Gallery parsing error:",
+              error
+            );
+
+            gallery = [];
+
+          }
+
+          if (Array.isArray(gallery)) {
+
+            gallery.forEach((image) => {
+
+              if (!image) return;
+
+              const imageUrl =
+                normalizeImage(image);
+
+              /*
+               * Prevent duplicate main image
+               */
+
+              if (
+                !productImages.includes(
+                  imageUrl
+                )
+              ) {
+
+                productImages.push(
+                  imageUrl
+                );
+
+              }
+
+            });
+
+          }
+
+        }
+
+        setImages(productImages);
 
         setCurrent(0);
 
       } catch (error) {
 
         console.error(
-          "Category product details error:",
+          "Product details error:",
           error
         );
+
+        setProduct(null);
+
+        setImages([]);
 
         setError(
           "Unable to load this product."
         );
-
-        setProduct(null);
 
       } finally {
 
@@ -113,40 +187,66 @@ const ProDetails = () => {
 
     };
 
-    if (id) {
-      fetchProduct();
-    }
+    fetchProduct();
 
   }, [id]);
 
+  // ==========================================
+  // NORMALIZE IMAGE URL
+  // ==========================================
 
-  // ======================================
+  const normalizeImage = (image) => {
+
+    if (!image) {
+      return "";
+    }
+
+    if (image.startsWith("http")) {
+      return image;
+    }
+
+    if (image.startsWith("/")) {
+      return `${API}${image}`;
+    }
+
+    return `${API}/${image}`;
+
+  };
+
+  // ==========================================
   // LOADING
-  // ======================================
+  // ==========================================
 
   if (loading) {
 
     return (
-      <h2 className="loading">
-        Loading...
-      </h2>
+      <div className="product-loading">
+
+        <h2>
+          Loading product...
+        </h2>
+
+      </div>
     );
 
   }
 
-
-  // ======================================
+  // ==========================================
   // ERROR
-  // ======================================
+  // ==========================================
 
   if (error || !product) {
 
     return (
-      <div className="loading">
+      <div className="product-error">
 
         <h2>
-          {error || "Product not found"}
+          Unable to load this product.
         </h2>
+
+        <p>
+          Product ID: {id}
+        </p>
 
         <button
           onClick={() => navigate(-1)}
@@ -159,68 +259,9 @@ const ProDetails = () => {
 
   }
 
-
-  // ======================================
-  // IMAGES
-  // ======================================
-
-  const images = [];
-
-
-  if (product.main_image) {
-
-    images.push(
-      getImageUrl(product.main_image)
-    );
-
-  }
-
-
-  if (product.gallery) {
-
-    try {
-
-      const galleryImages =
-        Array.isArray(product.gallery)
-          ? product.gallery
-          : JSON.parse(product.gallery);
-
-
-      if (Array.isArray(galleryImages)) {
-
-        galleryImages.forEach((image) => {
-
-          const imageUrl =
-            getImageUrl(image);
-
-          if (
-            imageUrl &&
-            !images.includes(imageUrl)
-          ) {
-
-            images.push(imageUrl);
-
-          }
-
-        });
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Gallery parsing error:",
-        error
-      );
-
-    }
-
-  }
-
-
-  // ======================================
+  // ==========================================
   // IMAGE NAVIGATION
-  // ======================================
+  // ==========================================
 
   const nextImage = () => {
 
@@ -230,11 +271,11 @@ const ProDetails = () => {
 
     setCurrent(
       (prev) =>
-        (prev + 1) % images.length
+        (prev + 1) %
+        images.length
     );
 
   };
-
 
   const prevImage = () => {
 
@@ -251,10 +292,9 @@ const ProDetails = () => {
 
   };
 
-
-  // ======================================
+  // ==========================================
   // ADD TO CART
-  // ======================================
+  // ==========================================
 
   const handleAddToCart = () => {
 
@@ -270,52 +310,57 @@ const ProDetails = () => {
 
       price: Number(product.price),
 
-      image: images[0] || "",
+      image:
+        images.length > 0
+          ? images[0]
+          : "",
 
     });
 
   };
 
+  // ==========================================
+  // PAGE
+  // ==========================================
 
   return (
 
     <div className="ProDetails">
 
-
-      {/* ==================================
-          GALLERY
-      ================================== */}
+      {/* =====================================
+          LEFT SIDE
+      ====================================== */}
 
       <div className="gallery">
-
 
         {/* THUMBNAILS */}
 
         <div className="thumbs">
 
-          {images.map((image, index) => (
+          {images.map(
+            (image, index) => (
 
-            <img
-              key={`${image}-${index}`}
-              src={image}
-              className={
-                current === index
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setCurrent(index)
-              }
-              alt={
-                product.title ||
-                "Product"
-              }
-            />
+              <img
+                key={`${image}-${index}`}
+                src={image}
+                className={
+                  current === index
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setCurrent(index)
+                }
+                alt={
+                  product.title ||
+                  "Product"
+                }
+              />
 
-          ))}
+            )
+          )}
 
         </div>
-
 
         {/* MAIN IMAGE */}
 
@@ -336,7 +381,6 @@ const ProDetails = () => {
 
               )}
 
-
               <img
                 src={images[current]}
                 alt={
@@ -344,7 +388,6 @@ const ProDetails = () => {
                   "Product"
                 }
               />
-
 
               {images.length > 1 && (
 
@@ -371,29 +414,34 @@ const ProDetails = () => {
 
       </div>
 
-
-      {/* ==================================
-          PRODUCT INFO
-      ================================== */}
+      {/* =====================================
+          RIGHT SIDE
+      ====================================== */}
 
       <div className="info">
 
+        {/* PRODUCT TITLE */}
 
         <h2>
           {product.title}
         </h2>
 
+        {/* PRICE */}
 
         <h3 className="price">
+
           {product.price} AED
+
         </h3>
 
+        {/* DESCRIPTION */}
 
         <p className="desc">
+
           {product.description ||
             "High quality product."}
-        </p>
 
+        </p>
 
         {/* SHIPPING */}
 
@@ -406,10 +454,11 @@ const ProDetails = () => {
 
         </div>
 
+        {/* =================================
+            VARIATIONS
+        ================================= */}
 
-        {/* COLORS */}
-
-        {product.colors &&
+        {Array.isArray(product.colors) &&
           product.colors.length > 0 && (
 
             <div className="variants-box">
@@ -418,13 +467,11 @@ const ProDetails = () => {
                 Variations
               </h3>
 
-
               <div className="variant-row">
 
                 <span>
                   Colors:
                 </span>
-
 
                 <div className="variant-options">
 
@@ -449,11 +496,11 @@ const ProDetails = () => {
 
           )}
 
-
-        {/* ACTIONS */}
+        {/* =================================
+            ACTIONS
+        ================================= */}
 
         <div className="actions">
-
 
           <button
             className="cart-btn"
@@ -461,7 +508,6 @@ const ProDetails = () => {
           >
             Add to cart
           </button>
-
 
           <a
             href="https://wa.me/971545234489"
@@ -472,9 +518,7 @@ const ProDetails = () => {
             Chat on WhatsApp
           </a>
 
-
         </div>
-
 
       </div>
 
@@ -483,6 +527,5 @@ const ProDetails = () => {
   );
 
 };
-
 
 export default ProDetails;

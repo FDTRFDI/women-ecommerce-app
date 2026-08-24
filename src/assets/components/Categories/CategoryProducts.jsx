@@ -8,6 +8,7 @@ const API = "https://backend-women-ecommerce.onrender.com";
 function CategoryProducts() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const { addToCart } = useContext(CartContext);
 
   const [products, setProducts] = useState([]);
@@ -15,9 +16,9 @@ function CategoryProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ============================
+  // ==========================================
   // GET CATEGORY NAME
-  // ============================
+  // ==========================================
   useEffect(() => {
     const fetchCategory = async () => {
       try {
@@ -42,9 +43,7 @@ function CategoryProducts() {
         );
 
         if (currentCategory) {
-          setCategoryTitle(
-            currentCategory.title || currentCategory.name || "Products"
-          );
+          setCategoryTitle(currentCategory.title);
         } else {
           setCategoryTitle("Products");
         }
@@ -57,9 +56,9 @@ function CategoryProducts() {
     fetchCategory();
   }, [id]);
 
-  // ============================
-  // GET PRODUCTS BY CATEGORY
-  // ============================
+  // ==========================================
+  // GET PRODUCTS OF THIS CATEGORY
+  // ==========================================
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -85,21 +84,19 @@ function CategoryProducts() {
         setProducts(productList);
       } catch (error) {
         console.error("Products error:", error);
-        setError("Unable to load products.");
         setProducts([]);
+        setError("Unable to load products.");
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchProducts();
-    }
+    fetchProducts();
   }, [id]);
 
-  // ============================
-  // IMAGE URL
-  // ============================
+  // ==========================================
+  // PRODUCT IMAGE
+  // ==========================================
   const getImage = (product) => {
     let path = "";
 
@@ -136,74 +133,23 @@ function CategoryProducts() {
     return `${API}/${path}`;
   };
 
-  // ============================
-  // OPEN PRODUCT DETAILS
-  // ============================
-  const openProduct = (product) => {
-    // IMPORTANT:
-    // category_products uses "id"
-    // We DO NOT use product_id or _id here.
-    const productId = product.id;
-
-    if (!productId) {
-      console.error("Product ID missing:", product);
-      return;
-    }
-
-    navigate(`/prodetails/${productId}`);
-  };
-
-  // ============================
-  // ADD TO CART
-  // ============================
-  const handleAddToCart = (e, product) => {
-    e.stopPropagation();
-
-    const productId = product.id;
-
-    if (!productId) {
-      console.error("Product ID missing:", product);
-      return;
-    }
-
-    const imageUrl = getImage(product);
-
-    addToCart({
-      id: productId,
-      product_id: productId,
-      name: product.title,
-      title: product.title,
-      price: Number(product.price),
-      image: imageUrl,
-    });
-  };
-
-  // ============================
+  // ==========================================
   // LOADING
-  // ============================
+  // ==========================================
   if (loading) {
     return (
       <div className="category-products-page">
-        <div className="category-products-header">
-          <button
-            onClick={() => navigate(-1)}
-            className="back-btn"
-          >
-            Back
-          </button>
-
-          <h2>{categoryTitle || "Products"}</h2>
-        </div>
-
-        <p>Loading products...</p>
+        <h2>Loading products...</h2>
       </div>
     );
   }
 
+  // ==========================================
+  // PAGE
+  // ==========================================
   return (
     <div className="category-products-page">
 
-      {/* HEADER */}
       <div className="category-products-header">
 
         <button
@@ -219,28 +165,36 @@ function CategoryProducts() {
 
       </div>
 
-      {/* ERROR */}
       {error && (
-        <p style={{ color: "red" }}>
+        <p className="admin-error">
           {error}
         </p>
       )}
 
-      {/* EMPTY */}
-      {!error && products.length === 0 && (
-        <p>
-          No products in this category yet.
-        </p>
-      )}
-
-      {/* PRODUCTS */}
-      {products.length > 0 && (
+      {!error && products.length === 0 ? (
+        <p>No products in this category yet.</p>
+      ) : (
         <div className="products-grid">
 
           {products.map((product) => {
 
-            // IMPORTANT:
-            // The correct ID is ONLY product.id
+            /*
+             * IMPORTANT
+             *
+             * Backend category_products returns:
+             *
+             * id
+             * title
+             * price
+             * description
+             * main_image
+             * gallery
+             * colors
+             * category_id
+             *
+             * Therefore we MUST use product.id.
+             */
+
             const productId = product.id;
 
             const imageUrl = getImage(product);
@@ -251,10 +205,15 @@ function CategoryProducts() {
                 className="product-card"
               >
 
-                {/* CLICK AREA */}
+                {/* ==================================
+                    PRODUCT CLICK AREA
+                ================================== */}
+
                 <div
                   className="click-area"
-                  onClick={() => openProduct(product)}
+                  onClick={() =>
+                    navigate(`/prodetails/${productId}`)
+                  }
                 >
 
                   {imageUrl ? (
@@ -293,12 +252,24 @@ function CategoryProducts() {
 
                 </div>
 
-                {/* ADD TO CART */}
+                {/* ==================================
+                    ADD TO CART
+                ================================== */}
+
                 <button
                   className="add-btn"
-                  onClick={(e) =>
-                    handleAddToCart(e, product)
-                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    addToCart({
+                      id: productId,
+                      product_id: productId,
+                      name: product.title,
+                      title: product.title,
+                      price: Number(product.price),
+                      image: imageUrl,
+                    });
+                  }}
                 >
                   +
                 </button>
