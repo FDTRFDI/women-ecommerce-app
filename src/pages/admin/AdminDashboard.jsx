@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "../../utils/axios";
 import "./admin.css";
 
@@ -17,6 +18,34 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
+  const getCount = (data) => {
+    if (Array.isArray(data)) {
+      return data.length;
+    }
+
+    if (Array.isArray(data?.data)) {
+      return data.data.length;
+    }
+
+    if (Array.isArray(data?.products)) {
+      return data.products.length;
+    }
+
+    if (Array.isArray(data?.categories)) {
+      return data.categories.length;
+    }
+
+    if (Array.isArray(data?.orders)) {
+      return data.orders.length;
+    }
+
+    if (Array.isArray(data?.users)) {
+      return data.users.length;
+    }
+
+    return 0;
+  };
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -25,8 +54,8 @@ const AdminDashboard = () => {
       const results = await Promise.allSettled([
         axios.get("/api/products"),
         axios.get("/api/categories"),
-        axios.get("/api/orders"),
-        axios.get("/api/users"),
+        axios.get("/api/admin/orders"),
+        axios.get("/admin/users"),
       ]);
 
       const products =
@@ -50,23 +79,22 @@ const AdminDashboard = () => {
           : [];
 
       setStats({
-        products: Array.isArray(products)
-          ? products.length
-          : products?.data?.length || 0,
-
-        categories: Array.isArray(categories)
-          ? categories.length
-          : categories?.data?.length || 0,
-
-        orders: Array.isArray(orders)
-          ? orders.length
-          : orders?.data?.length || 0,
-
-        users: Array.isArray(users)
-          ? users.length
-          : users?.data?.length || 0,
+        products: getCount(products),
+        categories: getCount(categories),
+        orders: getCount(orders),
+        users: getCount(users),
       });
 
+      const failedRequests = results.filter(
+        (result) => result.status === "rejected"
+      );
+
+      if (failedRequests.length > 0) {
+        console.warn(
+          "Some dashboard requests failed:",
+          failedRequests
+        );
+      }
     } catch (err) {
       console.error("Dashboard error:", err);
       setError("Unable to load dashboard data.");
@@ -91,10 +119,12 @@ const AdminDashboard = () => {
         </div>
 
         <button
+          type="button"
           className="btn primary"
           onClick={fetchDashboardData}
+          disabled={loading}
         >
-          Refresh
+          {loading ? "Loading..." : "Refresh"}
         </button>
       </div>
 
@@ -108,7 +138,6 @@ const AdminDashboard = () => {
       {/* STATS */}
       <div className="dashboard-stats">
 
-        {/* PRODUCTS */}
         <div className="dashboard-card">
           <div className="dashboard-card-icon">
             🛍️
@@ -123,7 +152,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* CATEGORIES */}
         <div className="dashboard-card">
           <div className="dashboard-card-icon">
             📂
@@ -138,7 +166,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* ORDERS */}
         <div className="dashboard-card">
           <div className="dashboard-card-icon">
             📦
@@ -153,7 +180,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* USERS */}
         <div className="dashboard-card">
           <div className="dashboard-card-icon">
             👥
@@ -173,82 +199,95 @@ const AdminDashboard = () => {
       {/* QUICK ACTIONS */}
       <div className="dashboard-section">
 
-        <h2>
-          Quick Actions
-        </h2>
+        <h2>Quick Actions</h2>
 
         <div className="dashboard-actions">
 
-          <a
-            href="/admin/products"
+          <Link
+            to="/admin/products"
             className="dashboard-action"
           >
             <span>🛍️</span>
+
             <div>
-              <strong>Manage Products</strong>
+              <strong>
+                Manage Products
+              </strong>
+
               <small>
                 Add, edit or delete products
               </small>
             </div>
-          </a>
+          </Link>
 
-          <a
-            href="/admin/categories"
+          <Link
+            to="/admin/categories"
             className="dashboard-action"
           >
             <span>📂</span>
+
             <div>
-              <strong>Manage Categories</strong>
+              <strong>
+                Manage Categories
+              </strong>
+
               <small>
                 Create and manage categories
               </small>
             </div>
-          </a>
+          </Link>
 
-          <a
-            href="/admin/orders"
+          <Link
+            to="/admin/orders"
             className="dashboard-action"
           >
             <span>📦</span>
+
             <div>
-              <strong>Manage Orders</strong>
+              <strong>
+                Manage Orders
+              </strong>
+
               <small>
                 View customer orders
               </small>
             </div>
-          </a>
+          </Link>
 
-          <a
-            href="/admin/users"
+          <Link
+            to="/admin/users"
             className="dashboard-action"
           >
             <span>👥</span>
+
             <div>
-              <strong>Manage Users</strong>
+              <strong>
+                Manage Users
+              </strong>
+
               <small>
                 View registered users
               </small>
             </div>
-          </a>
+          </Link>
 
         </div>
-
       </div>
 
       {/* SYSTEM STATUS */}
       <div className="dashboard-section">
 
-        <h2>
-          System Status
-        </h2>
+        <h2>System Status</h2>
 
         <div className="system-status">
 
           <div className="status-item">
             <span className="status-dot"></span>
+
             <span>
               Backend API
             </span>
+
             <strong>
               Connected
             </strong>
@@ -256,9 +295,11 @@ const AdminDashboard = () => {
 
           <div className="status-item">
             <span className="status-dot"></span>
+
             <span>
               Database
             </span>
+
             <strong>
               Connected
             </strong>
@@ -266,16 +307,17 @@ const AdminDashboard = () => {
 
           <div className="status-item">
             <span className="status-dot"></span>
+
             <span>
               Admin Authentication
             </span>
+
             <strong>
               Active
             </strong>
           </div>
 
         </div>
-
       </div>
 
     </div>

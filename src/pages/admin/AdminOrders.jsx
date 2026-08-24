@@ -1,39 +1,53 @@
 import { useEffect, useState } from "react";
 import axios from "../../utils/axios";
-import AdminNavbar from "./AdminNavbar";
-
-const TELEGRAM_TOKEN = "YOUR_BOT_TOKEN";
-const TELEGRAM_CHAT_ID = "CLIENT_CHAT_ID"; // مثال: +971542483423
+import "./admin.css";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchOrders = async () => {
     try {
+      setLoading(true);
+      setError("");
+
       const { data } = await axios.get("/api/admin/orders");
-      setOrders(data);
+
+      setOrders(
+        Array.isArray(data)
+          ? data
+          : data?.orders || data?.data || []
+      );
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching orders:", error);
+
+      setError(
+        error.response?.data?.message ||
+        "Error loading orders"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   const updateStatus = async (orderId, status) => {
     try {
-      await axios.put(`/api/admin/orders/${orderId}`, { status });
+      await axios.put(
+        `/api/admin/orders/${orderId}`,
+        { status }
+      );
 
-      // إرسال رسالة Telegram تلقائيًا
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: `Your order #${orderId} has been updated to status: ${status}`,
-        }),
-      });
+      await fetchOrders();
 
-      fetchOrders();
+      alert(`Order #${orderId} updated to ${status}`);
     } catch (error) {
-      console.error(error);
+      console.error("Error updating order:", error);
+
+      alert(
+        error.response?.data?.message ||
+        "Error updating order"
+      );
     }
   };
 
@@ -42,34 +56,128 @@ const AdminOrders = () => {
   }, []);
 
   return (
-    <div>
-      <AdminNavbar />
-      <h1>Manage Orders</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Customer</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.id}>
-              <td>{order.id}</td>
-              <td>{order.customer_name}</td>
-              <td>${order.total_price}</td>
-              <td>{order.status}</td>
-              <td>
-                <button onClick={() => updateStatus(order.id, "Paid")}>Mark Paid</button>
-                <button onClick={() => updateStatus(order.id, "Shipped")}>Mark Shipped</button>
-              </td>
+    <div className="admin-dashboard-container">
+
+      <div className="admin-dashboard-header">
+
+        <div>
+          <h1 className="admin-title">
+            Manage Orders
+          </h1>
+
+          <p>
+            View and manage customer orders.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="btn primary"
+          onClick={fetchOrders}
+          disabled={loading}
+        >
+          {loading ? "Loading..." : "Refresh"}
+        </button>
+
+      </div>
+
+      {error && (
+        <div className="admin-error">
+          {error}
+        </div>
+      )}
+
+      <div className="admin-table-wrapper">
+
+        <table className="admin-table">
+
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+
+            {loading ? (
+              <tr>
+                <td colSpan="5">
+                  Loading orders...
+                </td>
+              </tr>
+            ) : orders.length === 0 ? (
+              <tr>
+                <td colSpan="5">
+                  No orders found
+                </td>
+              </tr>
+            ) : (
+              orders.map((order) => (
+                <tr key={order.id}>
+
+                  <td>
+                    #{order.id}
+                  </td>
+
+                  <td>
+                    {order.customer_name ||
+                      order.customerName ||
+                      order.user?.name ||
+                      "N/A"}
+                  </td>
+
+                  <td>
+                    ${order.total_price || 0}
+                  </td>
+
+                  <td>
+                    {order.status || "Pending"}
+                  </td>
+
+                  <td>
+
+                    <button
+                      type="button"
+                      className="btn success small"
+                      onClick={() =>
+                        updateStatus(
+                          order.id,
+                          "Paid"
+                        )
+                      }
+                    >
+                      Mark Paid
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn primary small"
+                      onClick={() =>
+                        updateStatus(
+                          order.id,
+                          "Shipped"
+                        )
+                      }
+                    >
+                      Mark Shipped
+                    </button>
+
+                  </td>
+
+                </tr>
+              ))
+            )}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
     </div>
   );
 };

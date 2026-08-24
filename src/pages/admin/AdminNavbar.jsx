@@ -10,15 +10,13 @@ const AdminNavbar = () => {
   };
 
   return (
-    <nav className="admin-navbar">
-
+    <aside className="admin-navbar">
       <div className="admin-brand">
         <h2>Admin Panel</h2>
         <p>Women E-Commerce</p>
       </div>
 
-      <div className="admin-links">
-
+      <nav className="admin-links">
         <Link to="/admin">
           📊 Dashboard
         </Link>
@@ -38,22 +36,18 @@ const AdminNavbar = () => {
         <Link to="/admin/users">
           👥 Users
         </Link>
-
-      </div>
+      </nav>
 
       <div className="admin-actions">
-
         <Link to="/">
           🏠 Back to Store
         </Link>
 
-        <button onClick={handleLogout}>
+        <button type="button" onClick={handleLogout}>
           🚪 Logout
         </button>
-
       </div>
-
-    </nav>
+    </aside>
   );
 };
 
