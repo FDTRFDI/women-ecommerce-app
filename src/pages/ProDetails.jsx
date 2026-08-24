@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useMemo } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import "./ProDetails.css";
@@ -16,24 +16,31 @@ const ProDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // =========================================================
-  // GET PRODUCT
-  // =========================================================
+  // ==========================================
+  // GET SINGLE CATEGORY PRODUCT
+  // ==========================================
   useEffect(() => {
-    const fetchProduct = async () => {
+    const loadProduct = async () => {
       try {
         setLoading(true);
         setError("");
+        setProduct(null);
+
+        console.log("Loading category product:", id);
 
         const response = await fetch(
           `${API}/api/category-products/product/${id}`
         );
 
+        console.log("Product response status:", response.status);
+
         if (!response.ok) {
-          throw new Error("Product not found");
+          throw new Error(`Product request failed: ${response.status}`);
         }
 
         const data = await response.json();
+
+        console.log("Product data:", data);
 
         if (!data || !data.id) {
           throw new Error("Invalid product data");
@@ -49,23 +56,43 @@ const ProDetails = () => {
       }
     };
 
-    fetchProduct();
+    if (id) {
+      loadProduct();
+    }
   }, [id]);
 
-  // =========================================================
-  // IMAGE URL
-  // =========================================================
+  // ==========================================
+  // LOADING
+  // ==========================================
+  if (loading) {
+    return <h2 className="loading">Loading...</h2>;
+  }
+
+  // ==========================================
+  // ERROR
+  // ==========================================
+  if (error || !product) {
+    return (
+      <div className="product-error">
+        <h2>Unable to load this product.</h2>
+
+        <button onClick={() => navigate(-1)}>
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // BUILD IMAGE URL
+  // ==========================================
   const getImageUrl = (image) => {
     if (!image) return "";
 
-    if (typeof image !== "string") return "";
-
-    // Already full URL
-    if (image.startsWith("http://") || image.startsWith("https://")) {
+    if (image.startsWith("http")) {
       return image;
     }
 
-    // Backend already returns /uploads/...
     if (image.startsWith("/")) {
       return `${API}${image}`;
     }
@@ -73,255 +100,169 @@ const ProDetails = () => {
     return `${API}/${image}`;
   };
 
-  // =========================================================
-  // NORMALIZE COLORS
-  // =========================================================
-  const normalizedColors = useMemo(() => {
-    if (!product?.colors) {
-      return [];
+  // ==========================================
+  // PRODUCT IMAGES
+  // ==========================================
+  const images = [];
+
+  if (product.main_image) {
+    images.push(getImageUrl(product.main_image));
+  }
+
+  if (product.gallery) {
+    let galleryImages = [];
+
+    try {
+      if (Array.isArray(product.gallery)) {
+        galleryImages = product.gallery;
+      } else if (typeof product.gallery === "string") {
+        galleryImages = JSON.parse(product.gallery);
+      }
+    } catch (err) {
+      console.error("Gallery parse error:", err);
+      galleryImages = [];
     }
+
+    if (Array.isArray(galleryImages)) {
+      galleryImages.forEach((img) => {
+        if (img) {
+          images.push(getImageUrl(img));
+        }
+      });
+    }
+  }
+
+  // ==========================================
+  // REMOVE DUPLICATE IMAGES
+  // ==========================================
+  const uniqueImages = [...new Set(images)];
+
+  // ==========================================
+  // COLORS / VARIATIONS
+  // ==========================================
+  const getColors = () => {
+    if (!product.colors) return [];
 
     let colors = product.colors;
 
-    // ---------------------------------------------------------
-    // CASE 1
-    // PostgreSQL / API returns an Array
-    // ---------------------------------------------------------
-    if (Array.isArray(colors)) {
-      return colors
-        .flatMap((color) => {
-          if (typeof color !== "string") return [];
-
-          const value = color.trim();
-
-          if (!value) return [];
-
-          // Sometimes one item contains JSON array
-          if (value.startsWith("[") && value.endsWith("]")) {
-            try {
-              const parsed = JSON.parse(value);
-
-              if (Array.isArray(parsed)) {
-                return parsed;
-              }
-            } catch (err) {
-              // Ignore JSON parsing error
-            }
-          }
-
-          return [value];
-        })
-        .map((color) => String(color).trim())
-        .filter(Boolean);
-    }
-
-    // ---------------------------------------------------------
-    // CASE 2
-    // API returns JSON string
-    // Example:
-    // '["transparent 36 , transparent 72","net weight 36 + 72"]'
-    // ---------------------------------------------------------
-    if (typeof colors === "string") {
-      const value = colors.trim();
-
-      if (!value) {
-        return [];
-      }
-
-      // Try JSON
-      if (value.startsWith("[") && value.endsWith("]")) {
-        try {
-          const parsed = JSON.parse(value);
-
-          if (Array.isArray(parsed)) {
-            return parsed
-              .flatMap((item) => {
-                if (typeof item !== "string") return [];
-
-                const itemValue = item.trim();
-
-                if (!itemValue) return [];
-
-                return [itemValue];
-              })
-              .filter(Boolean);
-          }
-        } catch (err) {
-          console.log("Colors JSON parse failed");
+    try {
+      // PostgreSQL ممكن يرجع Array
+      if (Array.isArray(colors)) {
+        // عندك في قاعدة البيانات القيمة نفسها JSON string
+        if (
+          colors.length === 1 &&
+          typeof colors[0] === "string" &&
+          colors[0].trim().startsWith("[")
+        ) {
+          colors = JSON.parse(colors[0]);
         }
       }
 
-      // PostgreSQL array format:
-      // {"red","blue","green"}
-      if (value.startsWith("{") && value.endsWith("}")) {
-        const clean = value.substring(1, value.length - 1);
-
-        return clean
-          .split(",")
-          .map((item) => item.trim().replace(/^"|"$/g, ""))
-          .filter(Boolean);
+      // لو رجعت String مباشرة
+      if (typeof colors === "string") {
+        colors = JSON.parse(colors);
       }
-
-      // Single color
-      return [value];
-    }
-
-    return [];
-  }, [product]);
-
-  // =========================================================
-  // IMAGES
-  // =========================================================
-  const images = useMemo(() => {
-    if (!product) {
+    } catch (err) {
+      console.error("Colors parse error:", err);
       return [];
     }
 
-    const result = [];
-
-    // Main image
-    if (product.main_image) {
-      const mainImage = getImageUrl(product.main_image);
-
-      if (mainImage) {
-        result.push(mainImage);
-      }
+    if (!Array.isArray(colors)) {
+      return [];
     }
 
-    // Gallery
-    if (product.gallery) {
-      let gallery = product.gallery;
+    return colors
+      .flatMap((color) => {
+        if (typeof color !== "string") return [];
 
-      // If gallery is string, try JSON
-      if (typeof gallery === "string") {
-        try {
-          gallery = JSON.parse(gallery);
-        } catch (err) {
-          // PostgreSQL array format
-          if (gallery.startsWith("{") && gallery.endsWith("}")) {
-            const clean = gallery.substring(1, gallery.length - 1);
+        // لو القيمة فيها JSON داخلها
+        if (color.trim().startsWith("[")) {
+          try {
+            const parsed = JSON.parse(color);
 
-            gallery = clean
-              .split(",")
-              .map((item) => item.trim().replace(/^"|"$/g, ""))
-              .filter(Boolean);
-          } else {
-            gallery = [gallery];
+            if (Array.isArray(parsed)) {
+              return parsed;
+            }
+          } catch {
+            return [color];
           }
         }
-      }
 
-      if (Array.isArray(gallery)) {
-        gallery.forEach((image) => {
-          const imageUrl = getImageUrl(image);
-
-          if (imageUrl && !result.includes(imageUrl)) {
-            result.push(imageUrl);
-          }
-        });
-      }
-    }
-
-    return result;
-  }, [product]);
-
-  // =========================================================
-  // IMAGE NAVIGATION
-  // =========================================================
-  const nextImage = () => {
-    if (images.length === 0) return;
-
-    setCurrent((prev) => (prev + 1) % images.length);
+        return [color];
+      })
+      .map((color) => color.trim())
+      .filter(Boolean);
   };
 
-  const prevImage = () => {
-    if (images.length === 0) return;
+  const colors = getColors();
 
-    setCurrent((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
+  // ==========================================
+  // IMAGE NAVIGATION
+  // ==========================================
+  const nextImage = () => {
+    if (uniqueImages.length === 0) return;
+
+    setCurrent(
+      (prev) => (prev + 1) % uniqueImages.length
     );
   };
 
-  // =========================================================
-  // ADD TO CART
-  // =========================================================
-  const handleAddToCart = () => {
-    if (!product) return;
+  const prevImage = () => {
+    if (uniqueImages.length === 0) return;
 
+    setCurrent(
+      (prev) =>
+        prev === 0
+          ? uniqueImages.length - 1
+          : prev - 1
+    );
+  };
+
+  // ==========================================
+  // ADD TO CART
+  // ==========================================
+  const handleAddToCart = () => {
     addToCart({
       product_id: product.id,
       id: product.id,
       title: product.title,
       name: product.title,
       price: Number(product.price),
-      image: images[0] || "",
+      image: uniqueImages[0] || "",
     });
   };
 
-  // =========================================================
-  // LOADING
-  // =========================================================
-  if (loading) {
-    return (
-      <div className="product-details-state">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
-
-  // =========================================================
-  // ERROR
-  // =========================================================
-  if (error || !product) {
-    return (
-      <div className="product-details-state">
-        <h2>{error || "Unable to load this product."}</h2>
-
-        <button
-          className="back-btn"
-          onClick={() => navigate(-1)}
-        >
-          Go Back
-        </button>
-      </div>
-    );
-  }
-
-  // =========================================================
+  // ==========================================
   // PAGE
-  // =========================================================
+  // ==========================================
   return (
     <div className="ProDetails">
 
-      {/* =====================================================
+      {/* ================================
           GALLERY
-      ===================================================== */}
+      ================================= */}
+
       <div className="gallery">
 
-        {/* THUMBNAILS */}
         <div className="thumbs">
 
-          {images.map((img, index) => (
+          {uniqueImages.map((img, i) => (
             <img
-              key={`${img}-${index}`}
+              key={`${img}-${i}`}
               src={img}
-              className={current === index ? "active" : ""}
-              onClick={() => setCurrent(index)}
-              alt={`${product.title} ${index + 1}`}
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
+              className={current === i ? "active" : ""}
+              onClick={() => setCurrent(i)}
+              alt={`${product.title} ${i + 1}`}
             />
           ))}
 
         </div>
 
-        {/* MAIN IMAGE */}
         <div className="main-image">
 
-          {images.length > 0 ? (
+          {uniqueImages.length > 0 ? (
             <>
-              {images.length > 1 && (
+              {uniqueImages.length > 1 && (
                 <button
                   className="nav-btn left"
                   onClick={prevImage}
@@ -332,14 +273,11 @@ const ProDetails = () => {
               )}
 
               <img
-                src={images[current]}
+                src={uniqueImages[current]}
                 alt={product.title}
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
               />
 
-              {images.length > 1 && (
+              {uniqueImages.length > 1 && (
                 <button
                   className="nav-btn right"
                   onClick={nextImage}
@@ -351,55 +289,60 @@ const ProDetails = () => {
             </>
           ) : (
             <div className="no-image">
-              No Image Available
+              No Image
             </div>
           )}
 
         </div>
+
       </div>
 
-      {/* =====================================================
-          PRODUCT INFO
-      ===================================================== */}
+      {/* ================================
+          PRODUCT INFORMATION
+      ================================= */}
+
       <div className="info">
 
-        {/* TITLE */}
-        <h2>{product.title}</h2>
+        <h2>
+          {product.title}
+        </h2>
 
-        {/* PRICE */}
         <h3 className="price">
-          {Number(product.price || 0).toFixed(2)} AED
+          {Number(product.price).toFixed(2)} AED
         </h3>
 
-        {/* DESCRIPTION */}
         <p className="desc">
           {product.description || "High quality product."}
         </p>
 
         {/* SHIPPING */}
+
         <div className="shipping-box">
           <p>
             Estimated delivery: 5–7 business days
           </p>
         </div>
 
-        {/* =================================================
-            VARIATIONS
-        ================================================= */}
-        {normalizedColors.length > 0 && (
-          <div className="variants-box">
+        {/* VARIATIONS */}
 
-            <h3>Variations</h3>
+        <div className="variants-box">
 
+          <h3>
+            Variations
+          </h3>
+
+          {colors.length > 0 ? (
             <div className="variant-row">
 
-              <span>Colors:</span>
+              <span>
+                Colors:
+              </span>
 
               <div className="variant-options">
 
-                {normalizedColors.map((color, index) => (
+                {colors.map((color, index) => (
                   <div
-                    key={`${color}-${index}`}
+                    key={index}
                     className="variant-item"
                   >
                     {color}
@@ -409,13 +352,16 @@ const ProDetails = () => {
               </div>
 
             </div>
+          ) : (
+            <p>
+              No variations available.
+            </p>
+          )}
 
-          </div>
-        )}
+        </div>
 
-        {/* =================================================
-            ACTIONS
-        ================================================= */}
+        {/* ACTIONS */}
+
         <div className="actions">
 
           <button
