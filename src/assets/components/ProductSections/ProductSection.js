@@ -1,8 +1,7 @@
 import React, { useContext } from "react";
 import { CartContext } from "../../../context/CartContext";
 import { useNavigate } from "react-router-dom";
-import "./ProductsSections.css";
-
+import "./ProductSections.css";
 const API = "https://backend-women-ecommerce.onrender.com";
 
 const ProductSection = ({ title, products = [] }) => {
