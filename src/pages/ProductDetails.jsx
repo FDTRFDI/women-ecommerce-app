@@ -13,20 +13,15 @@ import { CartContext } from "../context/CartContext";
 
 import "./ProductDetails.css";
 
-
 const API =
   "https://backend-women-ecommerce.onrender.com";
 
-
 const ProductDetails = () => {
-
   const { id } = useParams();
-
   const navigate = useNavigate();
 
   const { addToCart } =
     useContext(CartContext);
-
 
   const [product, setProduct] =
     useState(null);
@@ -40,18 +35,25 @@ const ProductDetails = () => {
   const [error, setError] =
     useState("");
 
-
-  // ======================================
+  // =========================================================
   // IMAGE URL
-  // ======================================
+  // =========================================================
 
   const getImageUrl = (path) => {
-
     if (!path) {
       return "";
     }
 
-    if (path.startsWith("http")) {
+    if (
+      typeof path !== "string"
+    ) {
+      return "";
+    }
+
+    if (
+      path.startsWith("http://") ||
+      path.startsWith("https://")
+    ) {
       return path;
     }
 
@@ -62,258 +64,372 @@ const ProductDetails = () => {
     return `${API}/${path}`;
   };
 
+  // =========================================================
+  // PARSE ARRAY
+  // =========================================================
 
-  // ======================================
+  const parseArray = (value) => {
+    if (!value) {
+      return [];
+    }
+
+    // Already array
+    if (Array.isArray(value)) {
+      let result = value;
+
+      // Handle PostgreSQL array containing JSON string
+      if (
+        result.length === 1 &&
+        typeof result[0] === "string" &&
+        result[0].trim().startsWith("[")
+      ) {
+        try {
+          result = JSON.parse(result[0]);
+        } catch {
+          return result;
+        }
+      }
+
+      return Array.isArray(result)
+        ? result
+        : [];
+    }
+
+    // JSON string
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value);
+
+        return Array.isArray(parsed)
+          ? parsed
+          : [];
+      } catch {
+        return [];
+      }
+    }
+
+    return [];
+  };
+
+  // =========================================================
   // GET NORMAL PRODUCT
-  // ======================================
+  // =========================================================
 
   useEffect(() => {
+    let cancelled = false;
 
     const fetchProduct = async () => {
-
       try {
-
         setLoading(true);
-
         setError("");
+        setProduct(null);
+        setCurrent(0);
 
-        const response = await fetch(
-          `${API}/api/products/${id}`
+        const productId = Number(id);
+
+        if (!productId) {
+          throw new Error(
+            "Invalid product ID"
+          );
+        }
+
+        console.log(
+          "Loading normal product:",
+          productId
         );
 
-        if (!response.ok) {
+        /*
+          IMPORTANT
 
+          Normal products use /api/products.
+
+          We first try the standard endpoint.
+        */
+
+        let response = await fetch(
+          `${API}/api/products/${productId}`
+        );
+
+        console.log(
+          "Normal product response:",
+          response.status
+        );
+
+        /*
+          Some backend versions expose the
+          single product through:
+
+          /api/products/product/:id
+
+          If the first endpoint returns 404,
+          automatically try that endpoint.
+        */
+
+        if (response.status === 404) {
+          console.log(
+            "Trying alternative product endpoint..."
+          );
+
+          response = await fetch(
+            `${API}/api/products/product/${productId}`
+          );
+
+          console.log(
+            "Alternative product response:",
+            response.status
+          );
+        }
+
+        if (!response.ok) {
           throw new Error(
             `Product request failed: ${response.status}`
           );
-
         }
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         console.log(
           "NORMAL PRODUCT DETAILS:",
           data
         );
 
-        setProduct(data);
+        /*
+          Handle APIs that return:
 
-        setCurrent(0);
+          {
+            data: {...}
+          }
 
-      } catch (error) {
+          or:
 
+          {
+            product: {...}
+          }
+
+          as well as direct product object.
+        */
+
+        const productData =
+          data?.product ||
+          data?.data ||
+          data;
+
+        if (
+          !productData ||
+          !productData.id
+        ) {
+          throw new Error(
+            "Invalid product data"
+          );
+        }
+
+        if (!cancelled) {
+          setProduct(productData);
+          setCurrent(0);
+        }
+
+      } catch (err) {
         console.error(
           "Product details error:",
-          error
+          err
         );
 
-        setError(
-          "Unable to load this product."
-        );
+        if (!cancelled) {
+          setError(
+            "Unable to load this product."
+          );
 
-        setProduct(null);
+          setProduct(null);
+        }
 
       } finally {
-
-        setLoading(false);
-
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-
     };
-
 
     if (id) {
       fetchProduct();
     }
 
+    return () => {
+      cancelled = true;
+    };
+
   }, [id]);
 
-
-  // ======================================
+  // =========================================================
   // LOADING
-  // ======================================
+  // =========================================================
 
   if (loading) {
-
     return (
       <h2 className="loading">
         Loading...
       </h2>
     );
-
   }
 
-
-  // ======================================
+  // =========================================================
   // ERROR
-  // ======================================
+  // =========================================================
 
   if (error || !product) {
-
     return (
       <div className="loading">
 
         <h2>
-          {error || "Product not found"}
+          {error ||
+            "Product not found"}
         </h2>
 
         <button
           onClick={() => navigate(-1)}
+          type="button"
         >
           Go Back
         </button>
 
       </div>
     );
-
   }
 
-
-  // ======================================
-  // IMAGES
-  // ======================================
+  // =========================================================
+  // PRODUCT IMAGES
+  // =========================================================
 
   const images = [];
 
-
+  // Main image
   if (product.image) {
-
-    images.push(
-      getImageUrl(product.image)
-    );
-
-  }
-
-
-  if (product.main_image) {
-
     const image =
-      getImageUrl(product.main_image);
+      getImageUrl(product.image);
 
     if (
       image &&
       !images.includes(image)
     ) {
-
       images.push(image);
-
     }
-
   }
 
-
-  if (product.images) {
-
-    try {
-
-      const productImages =
-        Array.isArray(product.images)
-          ? product.images
-          : JSON.parse(product.images);
-
-
-      if (Array.isArray(productImages)) {
-
-        productImages.forEach(
-          (image) => {
-
-            const imageUrl =
-              getImageUrl(image);
-
-            if (
-              imageUrl &&
-              !images.includes(imageUrl)
-            ) {
-
-              images.push(imageUrl);
-
-            }
-
-          }
-        );
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Images parsing error:",
-        error
+  // Main image alternative
+  if (product.main_image) {
+    const image =
+      getImageUrl(
+        product.main_image
       );
 
+    if (
+      image &&
+      !images.includes(image)
+    ) {
+      images.push(image);
     }
-
   }
 
+  // images
+  const productImages =
+    parseArray(product.images);
 
-  // ======================================
-  // GALLERY
-  // ======================================
+  productImages.forEach(
+    (image) => {
+      const imageUrl =
+        getImageUrl(image);
 
-  if (product.gallery) {
+      if (
+        imageUrl &&
+        !images.includes(imageUrl)
+      ) {
+        images.push(imageUrl);
+      }
+    }
+  );
 
-    try {
+  // gallery
+  const galleryImages =
+    parseArray(product.gallery);
 
-      const gallery =
-        Array.isArray(product.gallery)
-          ? product.gallery
-          : JSON.parse(product.gallery);
+  galleryImages.forEach(
+    (image) => {
+      const imageUrl =
+        getImageUrl(image);
 
+      if (
+        imageUrl &&
+        !images.includes(imageUrl)
+      ) {
+        images.push(imageUrl);
+      }
+    }
+  );
 
-      if (Array.isArray(gallery)) {
+  // =========================================================
+  // COLORS / VARIATIONS
+  // =========================================================
 
-        gallery.forEach(
-          (image) => {
+  const colors = parseArray(
+    product.colors
+  )
+    .flatMap((color) => {
 
-            const imageUrl =
-              getImageUrl(image);
-
-            if (
-              imageUrl &&
-              !images.includes(imageUrl)
-            ) {
-
-              images.push(imageUrl);
-
-            }
-
-          }
-        );
-
+      if (
+        typeof color !== "string"
+      ) {
+        return [];
       }
 
-    } catch (error) {
+      const trimmed =
+        color.trim();
 
-      console.error(
-        "Gallery parsing error:",
-        error
-      );
+      /*
+        Handle JSON inside
+        PostgreSQL array.
+      */
 
-    }
+      if (
+        trimmed.startsWith("[")
+      ) {
+        try {
+          const parsed =
+            JSON.parse(trimmed);
 
-  }
+          if (
+            Array.isArray(parsed)
+          ) {
+            return parsed;
+          }
+        } catch {
+          return [trimmed];
+        }
+      }
 
+      return [trimmed];
+    })
+    .map((color) =>
+      String(color).trim()
+    )
+    .filter(Boolean);
 
-  // ======================================
+  // =========================================================
   // IMAGE NAVIGATION
-  // ======================================
+  // =========================================================
 
   const nextImage = () => {
-
     if (images.length === 0) {
       return;
     }
 
     setCurrent(
       (prev) =>
-        (prev + 1) % images.length
+        (prev + 1) %
+        images.length
     );
-
   };
 
-
   const prevImage = () => {
-
     if (images.length === 0) {
       return;
     }
@@ -324,58 +440,66 @@ const ProductDetails = () => {
           ? images.length - 1
           : prev - 1
     );
-
   };
 
-
-  // ======================================
+  // =========================================================
   // ADD TO CART
-  // ======================================
+  // =========================================================
 
   const handleAddToCart = () => {
+    const productId =
+      Number(product.id);
+
+    if (!productId) {
+      console.error(
+        "Invalid product ID:",
+        product
+      );
+      return;
+    }
 
     addToCart({
+      id: productId,
 
-      id: product.id,
-
-      product_id: product.id,
+      product_id: productId,
 
       name:
         product.name ||
-        product.title,
+        product.title ||
+        "Product",
 
       title:
         product.title ||
-        product.name,
+        product.name ||
+        "Product",
 
       price:
-        Number(product.price),
+        Number(product.price || 0),
 
       image:
         images[0] || "",
-
     });
-
   };
 
+  // =========================================================
+  // PAGE
+  // =========================================================
 
   return (
-
     <div className="product-details">
 
-
-      {/* ==================================
+      {/* =====================================================
           GALLERY
-      ================================== */}
+      ====================================================== */}
 
       <div className="gallery">
 
+        {/* THUMBNAILS */}
 
         <div className="thumbs">
 
           {images.map(
             (image, index) => (
-
               <img
                 key={`${image}-${index}`}
                 src={image}
@@ -390,95 +514,95 @@ const ProductDetails = () => {
                 alt={
                   product.name ||
                   product.title ||
-                  "Product"
+                  `Product ${
+                    index + 1
+                  }`
                 }
+                onError={(event) => {
+                  event.currentTarget.style.display =
+                    "none";
+                }}
               />
-
             )
           )}
 
         </div>
 
+        {/* MAIN IMAGE */}
 
         <div className="main-image">
 
           {images.length > 0 ? (
-
             <>
 
               {images.length > 1 && (
-
                 <button
                   className="nav-btn left"
                   onClick={prevImage}
+                  type="button"
                 >
                   ‹
                 </button>
-
               )}
 
-
               <img
-                src={images[current]}
+                src={
+                  images[current]
+                }
                 alt={
                   product.name ||
                   product.title ||
                   "Product"
                 }
+                onError={(event) => {
+                  event.currentTarget.style.display =
+                    "none";
+                }}
               />
 
-
               {images.length > 1 && (
-
                 <button
                   className="nav-btn right"
                   onClick={nextImage}
+                  type="button"
                 >
                   ›
                 </button>
-
               )}
 
             </>
-
           ) : (
-
             <div className="no-image">
               No Image
             </div>
-
           )}
 
         </div>
 
       </div>
 
-
-      {/* ==================================
-          INFO
-      ================================== */}
+      {/* =====================================================
+          PRODUCT INFORMATION
+      ====================================================== */}
 
       <div className="info">
-
 
         <h2>
           {product.name ||
             product.title}
         </h2>
 
-
         <h3 className="price">
-          {product.price} AED
+          {Number(
+            product.price || 0
+          ).toFixed(2)}{" "}
+          AED
         </h3>
 
-
         <p className="desc">
-
           {product.description ||
             "High quality product."}
-
         </p>
-
 
         {/* SHIPPING */}
 
@@ -491,62 +615,62 @@ const ProductDetails = () => {
 
         </div>
 
+        {/* VARIATIONS */}
 
-        {/* COLORS */}
+        <div className="variants-box">
 
-        {product.colors &&
-          product.colors.length > 0 && (
+          <h3>
+            Variations
+          </h3>
 
-            <div className="variants-box">
+          {colors.length > 0 ? (
 
-              <h3>
-                Variations
-              </h3>
+            <div className="variant-row">
 
+              <span>
+                Colors:
+              </span>
 
-              <div className="variant-row">
+              <div className="variant-options">
 
-                <span>
-                  Colors:
-                </span>
-
-
-                <div className="variant-options">
-
-                  {product.colors.map(
-                    (color, index) => (
-
-                      <div
-                        key={index}
-                        className="variant-item"
-                      >
-                        {color}
-                      </div>
-
-                    )
-                  )}
-
-                </div>
+                {colors.map(
+                  (color, index) => (
+                    <div
+                      key={`${color}-${index}`}
+                      className="variant-item"
+                    >
+                      {color}
+                    </div>
+                  )
+                )}
 
               </div>
 
             </div>
 
+          ) : (
+
+            <p>
+              No variations available.
+            </p>
+
           )}
 
+        </div>
 
         {/* ACTIONS */}
 
         <div className="actions">
 
-
           <button
             className="cart-btn"
-            onClick={handleAddToCart}
+            onClick={
+              handleAddToCart
+            }
+            type="button"
           >
             Add to cart
           </button>
-
 
           <a
             href="https://wa.me/971545234489"
@@ -557,17 +681,12 @@ const ProductDetails = () => {
             Chat on WhatsApp
           </a>
 
-
         </div>
-
 
       </div>
 
     </div>
-
   );
-
 };
-
 
 export default ProductDetails;
