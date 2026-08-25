@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./ProductSection.css";
-
+import "./ProductSections.css";
 const API = "https://backend-women-ecommerce.onrender.com";
 
 const ProductSection = ({ title, products = [] }) => {
