@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import ProductSection from "./ProductSection";
-import "./ProductSections.css";
 const API = "https://backend-women-ecommerce.onrender.com";
 
 function ProductSections() {
