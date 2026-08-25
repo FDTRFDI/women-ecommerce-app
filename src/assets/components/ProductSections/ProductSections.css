@@ -7,9 +7,9 @@
   --bg: #ffffff;
   --text: #0f172a;
   --card: #ffffff;
-  --image-bg: #f9fafb;
-  --shadow: rgba(0, 0, 0, 0.08);
-  --shadow-hover: rgba(0, 0, 0, 0.18);
+  --image-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.06);
+  --shadow-hover: rgba(0, 0, 0, 0.14);
   --primary: #2563eb;
   --price: #d32f2f;
   --star: #fbbf24;
@@ -24,6 +24,7 @@
   --shadow-hover: rgba(0, 0, 0, 0.55);
 }
 
+
 /* ============================
    GLOBAL
 ============================ */
@@ -34,6 +35,7 @@ body {
   max-width: 100%;
   margin: 0;
   padding: 0;
+
   overflow-x: hidden;
 }
 
@@ -41,17 +43,19 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: "Inter", sans-serif;
+
   transition: 0.3s ease;
 }
 
+
 /* ============================
-   FADE-IN ANIMATION
+   FADE IN
 ============================ */
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
   }
 
   to {
@@ -60,128 +64,180 @@ body {
   }
 }
 
+
 /* ============================
-   GRID LAYOUT
+   PRODUCTS GRID
+   ALIBABA STYLE
 ============================ */
 
 .noon-products {
+
   display: grid;
 
   /*
-    Desktop:
-    6 products per row
+    IMPORTANT:
+    6 products in one row
+    like Alibaba desktop layout
   */
-  grid-template-columns: repeat(6, minmax(0, 1fr));
 
-  gap: 16px;
-
-  width: 100%;
-  max-width: 1400px;
-
-  margin: 0 auto;
-  padding: 20px;
-
-  box-sizing: border-box;
-
-  overflow: hidden;
-}
-
-/* ============================
-   PRODUCT CARD
-============================ */
-
-.noon-card {
-  background: var(--card);
-
-  border-radius: 12px;
-
-  overflow: hidden;
-
-  box-shadow: 0 3px 10px var(--shadow);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-
-  cursor: pointer;
-
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  min-width: 0;
-
-  box-sizing: border-box;
-
-  animation: fadeIn 0.4s ease forwards;
-}
-
-.noon-card:hover {
-  transform: translateY(-4px);
-
-  box-shadow:
-    0 10px 24px var(--shadow-hover);
-}
-
-/* ============================
-   IMAGE
-============================ */
-
-.image-wrapper {
-  width: 100%;
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
 
   /*
-    Smaller and fixed image area
-    so products don't become huge
+    Small professional gap
   */
-  height: 180px;
 
-  background: var(--image-bg);
+  column-gap: 10px;
+  row-gap: 12px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+
+  max-width: 1500px;
+
+  margin: 0 auto;
 
   padding: 10px;
 
   box-sizing: border-box;
 
   overflow: hidden;
-
-  transition: 0.3s ease;
 }
 
-.image-wrapper img {
+
+/* ============================
+   PRODUCT CARD
+============================ */
+
+.noon-card {
+
+  position: relative;
+
   width: 100%;
+
+  min-width: 0;
+
+  background: var(--card);
+
+  border-radius: 8px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  cursor: pointer;
+
+  display: flex;
+
+  flex-direction: column;
+
+  /*
+    Very light shadow like marketplace cards
+  */
+
+  box-shadow:
+    0 1px 5px var(--shadow);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  animation:
+    fadeIn 0.35s ease forwards;
+}
+
+
+.noon-card:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 6px 16px var(--shadow-hover);
+}
+
+
+/* ============================
+   IMAGE AREA
+============================ */
+
+.image-wrapper {
+
+  width: 100%;
+
+  /*
+    Fixed height keeps
+    every product aligned
+  */
+
+  height: 205px;
+
+  background: var(--image-bg);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 8px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+}
+
+
+/* ============================
+   PRODUCT IMAGE
+============================ */
+
+.image-wrapper img {
+
+  width: 100%;
+
   height: 100%;
+
+  /*
+    VERY IMPORTANT
+    Prevent image from overflowing
+  */
 
   object-fit: contain;
 
   display: block;
 
-  transition: 0.3s ease;
+  transition:
+    transform 0.25s ease;
 }
+
 
 .noon-card:hover .image-wrapper img {
-  transform: scale(1.05);
+
+  transform: scale(1.04);
 }
 
+
 /* ============================
-   NAME
+   PRODUCT NAME
+   KEEP YOUR TEXT
 ============================ */
 
 .name {
+
   font-size: 14px;
 
-  font-weight: 600;
+  font-weight: 500;
 
   color: var(--text);
 
-  margin: 10px 12px 5px;
+  margin:
+    9px 10px 5px;
 
-  line-height: 1.4;
+  line-height: 1.35;
+
+  /*
+    Keep your existing text,
+    only limit visual height
+  */
 
   display: -webkit-box;
 
@@ -191,39 +247,42 @@ body {
 
   overflow: hidden;
 
-  min-height: 39px;
-
-  box-sizing: border-box;
+  min-height: 38px;
 }
+
 
 /* ============================
    PRICE
 ============================ */
 
 .price {
-  font-size: 16px;
+
+  font-size: 17px;
 
   font-weight: 700;
 
   color: var(--price);
 
-  margin: 3px 12px 8px;
+  margin:
+    2px 10px 7px;
 
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
+
 /* ============================
-   RATING + STAR ANIMATION
+   RATING
 ============================ */
 
 @keyframes starPulse {
+
   0% {
     transform: scale(1);
     opacity: 0.9;
   }
 
   50% {
-    transform: scale(1.12);
+    transform: scale(1.1);
     opacity: 1;
   }
 
@@ -233,65 +292,80 @@ body {
   }
 }
 
+
 .rating {
-  margin: 0 12px 12px;
+
+  margin:
+    0 10px 10px;
 
   color: var(--star);
 
   font-size: 13px;
 
   display: flex;
+
   align-items: center;
 
   gap: 3px;
 
-  min-height: 18px;
+  min-height: 17px;
 }
+
 
 .rating i {
-  animation: starPulse 1.6s infinite ease-in-out;
+
+  animation:
+    starPulse 1.6s infinite ease-in-out;
 }
 
+
 /* ============================
-   DISCOUNT BADGE
+   DISCOUNT
 ============================ */
 
 .discount-badge {
+
   position: absolute;
 
-  top: 8px;
-  left: 8px;
+  top: 7px;
+
+  left: 7px;
 
   background: #ef4444;
 
   color: #fff;
 
-  padding: 4px 7px;
+  padding:
+    4px 7px;
 
-  border-radius: 6px;
+  border-radius: 5px;
 
-  font-size: 11px;
+  font-size: 10px;
 
   font-weight: 700;
 
   box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.2);
+    0 2px 5px rgba(0, 0, 0, 0.18);
 
   z-index: 5;
 }
+
 
 /* ============================
    ADD BUTTON
 ============================ */
 
 .add-btn {
+
   position: absolute;
 
-  bottom: 9px;
-  right: 9px;
+  bottom: 8px;
 
-  width: 32px;
-  height: 32px;
+  right: 8px;
+
+  width: 30px;
+
+  height: 30px;
 
   border-radius: 50%;
 
@@ -304,107 +378,66 @@ body {
   font-size: 18px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
-  transition: 0.25s ease;
+  transition:
+    0.2s ease;
 
   cursor: pointer;
 
   z-index: 10;
 }
 
+
 .add-btn:hover {
+
   background: #1d4ed8;
 
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
+
 /* ============================
-   LARGE DESKTOP
+   DESKTOP
+   6 PRODUCTS
+============================ */
+
+@media (min-width: 1201px) {
+
+  .noon-products {
+
+    grid-template-columns:
+      repeat(6, minmax(0, 1fr));
+
+    column-gap: 10px;
+
+    row-gap: 12px;
+
+    padding:
+      10px;
+  }
+
+  .image-wrapper {
+
+    height: 205px;
+  }
+}
+
+
+/* ============================
+   LAPTOP
+   5 PRODUCTS
 ============================ */
 
 @media (max-width: 1200px) {
+
   .noon-products {
+
     grid-template-columns:
       repeat(5, minmax(0, 1fr));
-
-    gap: 14px;
-
-    padding: 18px;
-  }
-
-  .image-wrapper {
-    height: 175px;
-  }
-}
-
-/* ============================
-   TABLET / SMALL DESKTOP
-============================ */
-
-@media (max-width: 1000px) {
-  .noon-products {
-    grid-template-columns:
-      repeat(4, minmax(0, 1fr));
-
-    gap: 13px;
-
-    padding: 16px;
-  }
-
-  .image-wrapper {
-    height: 170px;
-  }
-}
-
-/* ============================
-   TABLET
-============================ */
-
-@media (max-width: 750px) {
-  .noon-products {
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
-
-    gap: 11px;
-
-    padding: 12px;
-  }
-
-  .image-wrapper {
-    height: 155px;
-
-    padding: 8px;
-  }
-
-  .name {
-    font-size: 13px;
-
-    margin: 9px 10px 4px;
-  }
-
-  .price {
-    font-size: 15px;
-
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-
-  .rating {
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-}
-
-/* ============================
-   MOBILE
-============================ */
-
-@media (max-width: 520px) {
-  .noon-products {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
 
     gap: 10px;
 
@@ -412,74 +445,202 @@ body {
   }
 
   .image-wrapper {
-    height: 165px;
+
+    height: 195px;
+  }
+}
+
+
+/* ============================
+   TABLET
+   4 PRODUCTS
+============================ */
+
+@media (max-width: 950px) {
+
+  .noon-products {
+
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    gap: 9px;
+
+    padding: 9px;
+  }
+
+  .image-wrapper {
+
+    height: 180px;
+  }
+
+  .name {
+
+    font-size: 13px;
+  }
+
+  .price {
+
+    font-size: 16px;
+  }
+}
+
+
+/* ============================
+   SMALL TABLET
+   3 PRODUCTS
+============================ */
+
+@media (max-width: 700px) {
+
+  .noon-products {
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
 
     padding: 8px;
   }
 
-  .noon-card {
-    border-radius: 10px;
+  .image-wrapper {
+
+    height: 165px;
+
+    padding: 7px;
   }
 
   .name {
+
     font-size: 13px;
 
-    margin: 8px 9px 4px;
-
-    min-height: 36px;
+    margin:
+      8px 8px 4px;
   }
 
   .price {
+
     font-size: 15px;
 
-    margin: 3px 9px 7px;
+    margin:
+      2px 8px 6px;
   }
 
   .rating {
-    margin: 0 9px 10px;
+
+    margin:
+      0 8px 8px;
+  }
+}
+
+
+/* ============================
+   MOBILE
+   2 PRODUCTS
+============================ */
+
+@media (max-width: 520px) {
+
+  .noon-products {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+
+    padding: 8px;
+  }
+
+  .image-wrapper {
+
+    height: 170px;
+
+    padding: 7px;
+  }
+
+  .noon-card {
+
+    border-radius: 7px;
+  }
+
+  .name {
 
     font-size: 12px;
+
+    margin:
+      7px 7px 4px;
+
+    min-height: 34px;
+  }
+
+  .price {
+
+    font-size: 15px;
+
+    margin:
+      2px 7px 6px;
+  }
+
+  .rating {
+
+    margin:
+      0 7px 8px;
+
+    font-size: 11px;
   }
 
   .add-btn {
-    width: 30px;
-    height: 30px;
 
-    right: 7px;
-    bottom: 7px;
+    width: 28px;
 
-    font-size: 17px;
+    height: 28px;
+
+    right: 6px;
+
+    bottom: 6px;
+
+    font-size: 16px;
   }
 
   .discount-badge {
-    top: 6px;
-    left: 6px;
 
-    padding: 3px 6px;
+    top: 5px;
 
-    font-size: 10px;
+    left: 5px;
+
+    padding:
+      3px 5px;
+
+    font-size: 9px;
   }
 }
+
 
 /* ============================
    VERY SMALL MOBILE
 ============================ */
 
 @media (max-width: 360px) {
+
   .noon-products {
-    gap: 8px;
-    padding: 8px;
+
+    gap: 6px;
+
+    padding: 6px;
   }
 
   .image-wrapper {
+
     height: 145px;
   }
 
   .name {
-    font-size: 12px;
+
+    font-size: 11px;
   }
 
   .price {
+
     font-size: 14px;
   }
 }
+```
