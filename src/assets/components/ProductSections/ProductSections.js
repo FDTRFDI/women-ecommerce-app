@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProductSection from "./ProductSection";
 const API = "https://backend-women-ecommerce.onrender.com";
-
+import "./ProductSections.css";
 function ProductSections() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
