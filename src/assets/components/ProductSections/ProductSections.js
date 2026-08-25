@@ -1,189 +1,140 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import "./ProductSections.css";
+import React, { useEffect, useState } from "react";
+import ProductSection from "./ProductSection";
+
 const API = "https://backend-women-ecommerce.onrender.com";
 
-const ProductSection = ({ title, products = [] }) => {
-  const navigate = useNavigate();
+function ProductSections() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // =========================================================
-  // GET PRODUCT IMAGE
+  // GET ALL CATEGORY PRODUCTS
   // =========================================================
-  const getImage = (product) => {
-    let image = "";
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
 
-    if (product.main_image) {
-      image = product.main_image;
-    } else if (product.image) {
-      image = product.image;
-    } else if (
-      Array.isArray(product.gallery) &&
-      product.gallery.length > 0
-    ) {
-      image = product.gallery[0];
-    }
+        console.log("=================================");
+        console.log("GETTING CATEGORY PRODUCTS");
+        console.log(`${API}/api/category-products`);
+        console.log("=================================");
 
-    if (!image) {
-      return "";
-    }
+        const response = await fetch(
+          `${API}/api/category-products`
+        );
 
-    if (
-      image.startsWith("http://") ||
-      image.startsWith("https://")
-    ) {
-      return image;
-    }
+        console.log(
+          "Category products status:",
+          response.status
+        );
 
-    if (image.startsWith("/")) {
-      return `${API}${image}`;
-    }
+        if (!response.ok) {
+          throw new Error(
+            `Failed to load products: ${response.status}`
+          );
+        }
 
-    return `${API}/${image}`;
-  };
+        const data = await response.json();
+
+        console.log(
+          "CATEGORY PRODUCTS RESPONSE:",
+          data
+        );
+
+        // =====================================================
+        // NORMALIZE RESPONSE
+        // =====================================================
+
+        let list = [];
+
+        if (Array.isArray(data)) {
+          list = data;
+        } else if (Array.isArray(data.data)) {
+          list = data.data;
+        } else if (Array.isArray(data.products)) {
+          list = data.products;
+        } else if (Array.isArray(data.category_products)) {
+          list = data.category_products;
+        }
+
+        console.log(
+          "NORMALIZED PRODUCTS:",
+          list
+        );
+
+        console.log(
+          "PRODUCT COUNT:",
+          list.length
+        );
+
+        setProducts(list);
+
+      } catch (error) {
+        console.error(
+          "ERROR FETCHING CATEGORY PRODUCTS:",
+          error
+        );
+
+        setProducts([]);
+
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // =========================================================
-  // OPEN CATEGORY PRODUCT DETAILS
+  // LOADING
   // =========================================================
-  const openProduct = (product) => {
-    /*
-      مهم جداً:
+  if (loading) {
+    return (
+      <section className="product-section">
+        <div className="product-section-header">
+          <h2>Best Deals</h2>
+        </div>
 
-      ProductSection يجلب المنتجات من:
-
-      /api/category-products
-
-      لذلك هذه المنتجات موجودة في:
-
-      category_products
-
-      وبالتالي يجب فتحها في:
-
-      /prodetails/:id
-
-      وليس:
-
-      /product/:id
-    */
-
-    const productId = Number(product?.id);
-
-    if (!productId) {
-      console.error(
-        "Invalid category product ID:",
-        product
-      );
-      return;
-    }
-
-    console.log(
-      "Opening category product:",
-      productId
+        <div className="products-grid">
+          <p>Loading products...</p>
+        </div>
+      </section>
     );
-
-    navigate(`/prodetails/${productId}`);
-  };
-
-  // =========================================================
-  // EMPTY PRODUCTS
-  // =========================================================
-  if (!Array.isArray(products) || products.length === 0) {
-    return null;
   }
 
   // =========================================================
-  // PAGE
+  // NO PRODUCTS
+  // =========================================================
+  if (!products.length) {
+    console.warn(
+      "ProductSections: Backend returned 0 products."
+    );
+
+    return (
+      <section className="product-section">
+        <div className="product-section-header">
+          <h2>Best Deals</h2>
+        </div>
+
+        <div className="products-grid">
+          <p className="no-products">
+            No products available
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  // =========================================================
+  // DISPLAY PRODUCTS
   // =========================================================
   return (
-    <section className="product-section">
-
-      {/* =========================
-          TITLE
-      ========================== */}
-      {title && (
-        <div className="product-section-header">
-          <h2>{title}</h2>
-        </div>
-      )}
-
-      {/* =========================
-          PRODUCTS
-      ========================== */}
-      <div className="products-grid">
-
-        {products.map((product) => {
-
-          const productId = Number(product.id);
-          const imageUrl = getImage(product);
-
-          return (
-            <div
-              key={productId}
-              className="product-card"
-              onClick={() => openProduct(product)}
-            >
-
-              {/* =========================
-                  IMAGE
-              ========================== */}
-              <div className="product-image-wrapper">
-
-                {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt={product.title || "Product"}
-                    className="product-image"
-                    onError={(event) => {
-                      event.currentTarget.style.display =
-                        "none";
-                    }}
-                  />
-                ) : (
-                  <div className="no-image">
-                    No Image
-                  </div>
-                )}
-
-              </div>
-
-              {/* =========================
-                  PRODUCT INFO
-              ========================== */}
-              <div className="product-info">
-
-                <h3 className="product-title">
-                  {product.title || "Product"}
-                </h3>
-
-                {/* RATING */}
-                <div className="rating-stars">
-                  ★★★★☆
-                </div>
-
-                {/* PRICE */}
-                <div className="price-row">
-
-                  <span className="product-price">
-                    {Number(product.price || 0).toFixed(2)} AED
-                  </span>
-
-                  {product.discount && (
-                    <span className="discount-tag">
-                      -{product.discount}%
-                    </span>
-                  )}
-
-                </div>
-
-              </div>
-
-            </div>
-          );
-        })}
-
-      </div>
-
-    </section>
+    <ProductSection
+      title="Best Deals"
+      products={products}
+    />
   );
-};
+}
 
-export default ProductSection;
+export default ProductSections;
