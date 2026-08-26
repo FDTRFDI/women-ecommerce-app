@@ -1,134 +1,427 @@
-/* PAGE */
+/* =========================================================
+   CATEGORY PRODUCTS PAGE
+   E-COMMERCE GRID STYLE
+========================================================= */
+
 .category-products-page {
-  padding: 15px;
+  width: 100%;
+  max-width: 1500px;
+
+  margin: 0 auto;
+
+  padding: 14px;
+
+  box-sizing: border-box;
+
+  overflow-x: hidden;
 }
 
-/* GRID */
+
+/* =========================================================
+   PRODUCTS GRID
+========================================================= */
+
 .products-grid {
+  width: 100%;
+
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* 👈 أصغر للموبايل */
-  gap: 15px;
+
+  /* DESKTOP - 7 PRODUCTS */
+  grid-template-columns:
+    repeat(7, minmax(0, 1fr));
+
+  gap: 14px;
+
+  box-sizing: border-box;
+
+  align-items: stretch;
 }
 
-/* CARD */
+
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
+
 .product-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 10px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-  transition: 0.25s ease;
-  cursor: pointer;
   position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  background: #ffffff;
+
+  border-radius: 14px;
+
+  padding: 10px;
+
+  margin: 0;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  cursor: pointer;
+
   display: flex;
   flex-direction: column;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.08);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
+
+
+/* =========================================================
+   CARD HOVER
+========================================================= */
 
 .product-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.14);
 }
 
-/* IMAGE */
+
+/* =========================================================
+   PRODUCT IMAGE
+========================================================= */
+
 .category-product-img {
   width: 100%;
+
   aspect-ratio: 1 / 1;
+
+  height: auto;
+
+  display: block;
+
   object-fit: cover;
-  border-radius: 12px;
-  background: #fff;
+
+  object-position: center;
+
+  border-radius: 10px;
+
+  background: #f8f8f8;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.25s ease;
 }
 
-/* NO IMAGE */
+
+/* =========================================================
+   IMAGE HOVER
+========================================================= */
+
+.product-card:hover .category-product-img {
+  transform: scale(1.03);
+}
+
+
+/* =========================================================
+   NO IMAGE
+========================================================= */
+
 .no-image {
   width: 100%;
+
   aspect-ratio: 1 / 1;
+
   display: flex;
+
   align-items: center;
   justify-content: center;
-  background: #eee;
+
+  background: #f3f4f6;
+
   border-radius: 10px;
-  color: #777;
-}
 
-/* TITLE */
-.product-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-top: 8px;
-  color: #333;
+  color: #9ca3af;
 
-  /* 👇 مهم عشان ميكسرش */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* PRICE */
-.product-price {
-  font-size: 16px;
-  font-weight: bold;
-  color: #e6007e;
-  margin-top: 5px;
-}
-
-/* DISCOUNT */
-.discount-tag {
-  background: #ff3b30;
-  color: #fff;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  margin-left: 5px;
-}
-
-/* RATING */
-.rating-stars {
-  color: #ffcc00;
   font-size: 13px;
-  margin-top: 4px;
+
+  box-sizing: border-box;
 }
 
-/* FOOTER (زرار +) */
+
+/* =========================================================
+   PRODUCT TITLE
+========================================================= */
+
+.product-title {
+  width: 100%;
+
+  margin: 9px 2px 4px;
+
+  padding: 0;
+
+  color: #111827;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  line-height: 1.3;
+
+  min-height: 36px;
+
+  display: -webkit-box;
+
+  -webkit-line-clamp: 2;
+
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+
+  word-break: break-word;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   RATING
+========================================================= */
+
+.rating-stars {
+  margin: 3px 2px 5px;
+
+  min-height: 17px;
+
+  color: #ffc400;
+
+  font-size: 12px;
+
+  line-height: 1;
+
+  display: flex;
+
+  align-items: center;
+}
+
+
+/* =========================================================
+   PRODUCT FOOTER
+========================================================= */
+
 .product-footer {
+  width: 100%;
+
+  min-height: 34px;
+
+  margin-top: auto;
+
   display: flex;
+
+  align-items: center;
+
   justify-content: space-between;
-  align-items: center;
-  margin-top: auto; /* 👈 مهم يخلي الزرار تحت */
+
+  gap: 6px;
+
+  box-sizing: border-box;
 }
 
-/* ADD BUTTON */
-.add-btn {
-  background: #000;
-  color: #fff;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: flex;
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.product-price {
+  margin: 0 2px;
+
+  color: #e6007e;
+
+  font-size: 16px;
+
+  font-weight: 800;
+
+  line-height: 1.2;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   DISCOUNT
+========================================================= */
+
+.discount-tag {
+  display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
-  font-size: 18px;
+
+  background: #ff3b30;
+
+  color: #ffffff;
+
+  padding: 3px 6px;
+
+  border-radius: 5px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  margin-left: 4px;
 }
 
-/* ========================= */
-/* 📱 TABLET */
-/* ========================= */
-@media (min-width: 768px) {
+
+/* =========================================================
+   ADD BUTTON
+========================================================= */
+
+.add-btn {
+  width: 34px;
+
+  height: 34px;
+
+  min-width: 34px;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  margin: 0;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #000000;
+
+  color: #ffffff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 21px;
+
+  font-weight: 400;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+
+/* =========================================================
+   ADD BUTTON HOVER
+========================================================= */
+
+.add-btn:hover {
+  background: #222222;
+
+  transform: scale(1.06);
+}
+
+
+/* =========================================================
+   ADD BUTTON ACTIVE
+========================================================= */
+
+.add-btn:active {
+  transform: scale(0.94);
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+   7 PRODUCTS
+========================================================= */
+
+@media (min-width: 1201px) {
+
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns:
+      repeat(7, minmax(0, 1fr));
+
+    gap: 14px;
   }
+
 }
 
-/* ========================= */
-/* 📱 MOBILE SMALL */
-/* ========================= */
-@media (max-width: 480px) {
+
+/* =========================================================
+   LAPTOP
+   6 PRODUCTS
+========================================================= */
+
+@media (max-width: 1200px) {
 
   .category-products-page {
-    padding: 10px;
+    padding: 13px;
   }
 
   .products-grid {
-    grid-template-columns: repeat(2, 1fr); /* 👈 2 كارد جنب بعض */
+    grid-template-columns:
+      repeat(6, minmax(0, 1fr));
+
+    gap: 13px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL LAPTOP
+   5 PRODUCTS
+========================================================= */
+
+@media (max-width: 1050px) {
+
+  .products-grid {
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+
     gap: 12px;
+  }
+
+}
+
+
+/* =========================================================
+   TABLET
+   4 PRODUCTS
+========================================================= */
+
+@media (max-width: 850px) {
+
+  .category-products-page {
+    padding: 12px;
+  }
+
+  .products-grid {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    gap: 11px;
+  }
+
+  .product-card {
+    padding: 8px;
+
+    border-radius: 12px;
+  }
+
+  .category-product-img {
+    border-radius: 9px;
   }
 
   .product-title {
@@ -139,9 +432,208 @@
     font-size: 15px;
   }
 
+}
+
+
+/* =========================================================
+   SMALL TABLET
+   3 PRODUCTS
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .category-products-page {
+    padding: 10px;
+  }
+
+  .products-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .product-card {
+    padding: 8px;
+
+    border-radius: 11px;
+  }
+
+  .product-title {
+    margin-top: 8px;
+
+    font-size: 13px;
+
+    min-height: 34px;
+  }
+
+  .rating-stars {
+    font-size: 11px;
+  }
+
+  .product-price {
+    font-size: 14px;
+  }
+
+  .add-btn {
+    width: 31px;
+    height: 31px;
+
+    min-width: 31px;
+
+    font-size: 19px;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   2 PRODUCTS
+========================================================= */
+
+@media (max-width: 480px) {
+
+  .category-products-page {
+    padding: 9px;
+  }
+
+  .products-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 9px;
+  }
+
+  .product-card {
+    padding: 7px;
+
+    border-radius: 10px;
+  }
+
+  .category-product-img {
+    border-radius: 8px;
+  }
+
+  .product-title {
+    margin: 7px 2px 4px;
+
+    font-size: 13px;
+
+    line-height: 1.3;
+
+    min-height: 34px;
+  }
+
+  .rating-stars {
+    margin: 3px 2px 4px;
+
+    font-size: 11px;
+  }
+
+  .product-footer {
+    min-height: 31px;
+  }
+
+  .product-price {
+    font-size: 15px;
+  }
+
   .add-btn {
     width: 30px;
     height: 30px;
-    font-size: 16px;
+
+    min-width: 30px;
+
+    border-radius: 6px;
+
+    font-size: 18px;
   }
+
+  .discount-tag {
+    font-size: 9px;
+
+    padding: 3px 5px;
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 360px) {
+
+  .category-products-page {
+    padding: 7px;
+  }
+
+  .products-grid {
+    gap: 8px;
+  }
+
+  .product-card {
+    padding: 6px;
+  }
+
+  .product-title {
+    font-size: 12px;
+
+    min-height: 32px;
+  }
+
+  .rating-stars {
+    font-size: 10px;
+  }
+
+  .product-price {
+    font-size: 14px;
+  }
+
+  .add-btn {
+    width: 28px;
+    height: 28px;
+
+    min-width: 28px;
+
+    font-size: 17px;
+  }
+
+}
+
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+.dark .product-card {
+  background: #1e293b;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+.dark .category-product-img {
+  background: #334155;
+}
+
+.dark .no-image {
+  background: #475569;
+
+  color: #cbd5e1;
+}
+
+.dark .product-title {
+  color: #f1f5f9;
+}
+
+.dark .add-btn {
+  background: #ffffff;
+
+  color: #000000;
+}
+
+.dark .add-btn:hover {
+  background: #e5e7eb;
 }
