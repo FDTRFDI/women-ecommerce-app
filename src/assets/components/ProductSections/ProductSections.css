@@ -1,162 +1,683 @@
-/* =====================================================
-   FINAL PRODUCT GRID OVERRIDE
-   ALIBABA STYLE
-===================================================== */
+```css
+/* =========================================================
+   PRODUCT SECTIONS
+   MODERN E-COMMERCE PRODUCT GRID
+========================================================= */
 
-.category-products-page {
-  width: 100% !important;
-  max-width: 1500px !important;
-  margin: 0 auto !important;
-  padding: 8px !important;
-  box-sizing: border-box !important;
-  overflow-x: hidden !important;
+.noon-section {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 20px 16px 35px;
+  box-sizing: border-box;
 }
 
-.products-grid {
-  display: grid !important;
 
-  /* EXACTLY 6 PRODUCTS */
-  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+/* =========================================================
+   HEADER
+========================================================= */
 
-  gap: 10px !important;
-
-  width: 100% !important;
-  max-width: 100% !important;
-
-  box-sizing: border-box !important;
-
-  overflow: visible !important;
+.noon-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  box-sizing: border-box;
 }
 
-.product-card {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
-
-  padding: 6px !important;
-
-  margin: 0 !important;
-
-  border-radius: 8px !important;
-
-  background: #fff !important;
-
-  box-sizing: border-box !important;
-
-  overflow: hidden !important;
-
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+.noon-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
 }
 
-.category-product-img {
-  width: 100% !important;
-  height: auto !important;
 
-  aspect-ratio: 1 / 1 !important;
+/* =========================================================
+   PRODUCT GRID
+========================================================= */
 
-  object-fit: contain !important;
+.noon-products {
+  width: 100%;
+  display: grid;
 
-  display: block !important;
+  /* Desktop = 7 products */
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 
-  border-radius: 6px !important;
+  gap: 14px;
 
-  background: #fff !important;
+  box-sizing: border-box;
+
+  align-items: stretch;
 }
 
-.product-title {
-  font-size: 14px !important;
 
-  line-height: 1.3 !important;
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
 
-  margin: 7px 2px 0 !important;
+.noon-product-card {
+  position: relative;
 
-  min-height: 36px !important;
+  width: 100%;
+  min-width: 0;
 
-  display: -webkit-box !important;
+  background: #ffffff;
 
-  -webkit-line-clamp: 2 !important;
+  border-radius: 14px;
 
-  -webkit-box-orient: vertical !important;
+  padding: 10px;
 
-  overflow: hidden !important;
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.08);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  cursor: pointer;
 }
+
+.noon-product-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.13);
+}
+
+
+/* =========================================================
+   CLICK AREA
+========================================================= */
+
+.noon-product-click {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   IMAGE WRAPPER
+========================================================= */
+
+.noon-image-wrapper {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 1 / 1;
+
+  background: #f9fafb;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PRODUCT IMAGE
+========================================================= */
+
+.noon-product-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  display: block;
+
+  transition: transform 0.25s ease;
+}
+
+.noon-product-card:hover .noon-product-image {
+  transform: scale(1.04);
+}
+
+
+/* =========================================================
+   NO IMAGE
+========================================================= */
+
+.no-image {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f3f4f6;
+
+  color: #9ca3af;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   DISCOUNT BADGE
+========================================================= */
+
+.discount-badge {
+  position: absolute;
+
+  top: 7px;
+  left: 7px;
+
+  z-index: 5;
+
+  background: #ef4444;
+
+  color: #ffffff;
+
+  padding: 4px 6px;
+
+  border-radius: 5px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================================
+   PRODUCT INFORMATION
+========================================================= */
+
+.noon-product-info {
+  width: 100%;
+
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PRODUCT TITLE
+========================================================= */
+
+.noon-product-info h3 {
+  margin: 9px 2px 5px;
+
+  padding: 0;
+
+  color: #111827;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  line-height: 1.3;
+
+  min-height: 36px;
+
+  display: -webkit-box;
+
+  -webkit-line-clamp: 2;
+
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   RATING
+========================================================= */
+
+.rating {
+  margin: 0 2px 5px;
+
+  min-height: 17px;
+
+  display: flex;
+  align-items: center;
+
+  color: #fbbf24;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   BOTTOM / PRICE AREA
+========================================================= */
+
+.product-bottom {
+  width: 100%;
+
+  min-height: 34px;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
 
 .product-price {
-  font-size: 16px !important;
+  display: block;
 
-  font-weight: 700 !important;
+  margin: 0 2px;
 
-  margin: 5px 2px !important;
-}
+  color: #e6007e;
 
-.rating-stars {
-  font-size: 12px !important;
+  font-size: 16px;
 
-  margin: 3px 2px !important;
-}
+  font-weight: 800;
 
-.product-footer {
-  margin-top: auto !important;
+  line-height: 1.2;
 
-  min-height: 34px !important;
-}
-
-.add-btn {
-  width: 34px !important;
-  height: 34px !important;
-
-  flex-shrink: 0 !important;
+  white-space: nowrap;
 }
 
 
-/* =====================================================
+/* =========================================================
+   ADD TO CART BUTTON
+========================================================= */
+
+.add-product-btn {
+  position: absolute;
+
+  right: 9px;
+  bottom: 9px;
+
+  width: 34px;
+  height: 34px;
+
+  padding: 0;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #000000;
+
+  color: #ffffff;
+
+  font-size: 22px;
+
+  font-weight: 400;
+
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  z-index: 20;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.add-product-btn:hover {
+  background: #222222;
+
+  transform: scale(1.06);
+}
+
+.add-product-btn:active {
+  transform: scale(0.95);
+}
+
+
+/* =========================================================
+   LOADING / EMPTY / ERROR
+========================================================= */
+
+.no-products {
+  grid-column: 1 / -1;
+
+  width: 100%;
+
+  margin: 30px 0;
+
+  padding: 30px;
+
+  text-align: center;
+
+  color: #6b7280;
+
+  font-size: 15px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+   7 PRODUCTS
+========================================================= */
+
+@media (min-width: 1201px) {
+  .noon-products {
+    grid-template-columns:
+      repeat(7, minmax(0, 1fr));
+  }
+}
+
+
+/* =========================================================
    LAPTOP
-===================================================== */
+   6 PRODUCTS
+========================================================= */
 
 @media (max-width: 1200px) {
-
-  .products-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  .noon-section {
+    padding-left: 14px;
+    padding-right: 14px;
   }
 
+  .noon-products {
+    grid-template-columns:
+      repeat(6, minmax(0, 1fr));
+
+    gap: 13px;
+  }
 }
 
 
-/* =====================================================
+/* =========================================================
+   SMALL LAPTOP
+   5 PRODUCTS
+========================================================= */
+
+@media (max-width: 1050px) {
+  .noon-products {
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+
+    gap: 12px;
+  }
+}
+
+
+/* =========================================================
    TABLET
-===================================================== */
+   4 PRODUCTS
+========================================================= */
 
-@media (max-width: 900px) {
-
-  .products-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+@media (max-width: 850px) {
+  .noon-section {
+    padding: 18px 12px 30px;
   }
 
+  .noon-products {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    gap: 11px;
+  }
+
+  .noon-header h2 {
+    font-size: 22px;
+  }
+
+  .noon-product-card {
+    padding: 8px;
+  }
+
+  .noon-product-info h3 {
+    font-size: 13px;
+  }
+
+  .product-price {
+    font-size: 15px;
+  }
 }
 
 
-/* =====================================================
+/* =========================================================
    SMALL TABLET
-===================================================== */
+   3 PRODUCTS
+========================================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 650px) {
+  .noon-products {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
 
-  .products-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px;
   }
 
+  .noon-product-card {
+    padding: 8px;
+    border-radius: 11px;
+  }
+
+  .noon-product-info h3 {
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  .rating {
+    font-size: 11px;
+  }
+
+  .product-price {
+    font-size: 14px;
+  }
+
+  .add-product-btn {
+    width: 31px;
+    height: 31px;
+
+    right: 7px;
+    bottom: 7px;
+
+    font-size: 19px;
+  }
 }
 
 
-/* =====================================================
+/* =========================================================
    MOBILE
-===================================================== */
+   2 PRODUCTS
+========================================================= */
 
 @media (max-width: 480px) {
-
-  .products-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 8px !important;
+  .noon-section {
+    padding: 15px 9px 25px;
   }
 
+  .noon-header {
+    margin-bottom: 13px;
+  }
+
+  .noon-header h2 {
+    font-size: 20px;
+  }
+
+  .noon-products {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 9px;
+  }
+
+  .noon-product-card {
+    padding: 7px;
+
+    border-radius: 10px;
+  }
+
+  .noon-image-wrapper {
+    border-radius: 8px;
+  }
+
+  .noon-product-info h3 {
+    margin: 7px 2px 4px;
+
+    font-size: 13px;
+
+    line-height: 1.3;
+
+    min-height: 34px;
+  }
+
+  .rating {
+    margin-bottom: 4px;
+
+    font-size: 11px;
+  }
+
+  .product-bottom {
+    min-height: 31px;
+  }
+
+  .product-price {
+    font-size: 15px;
+  }
+
+  .add-product-btn {
+    width: 30px;
+    height: 30px;
+
+    right: 6px;
+    bottom: 6px;
+
+    border-radius: 6px;
+
+    font-size: 18px;
+  }
+
+  .discount-badge {
+    top: 6px;
+    left: 6px;
+
+    padding: 3px 5px;
+
+    font-size: 9px;
+  }
 }
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+  .noon-section {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .noon-products {
+    gap: 7px;
+  }
+
+  .noon-product-card {
+    padding: 6px;
+  }
+
+  .noon-product-info h3 {
+    font-size: 12px;
+
+    min-height: 32px;
+  }
+
+  .rating {
+    font-size: 10px;
+  }
+
+  .product-price {
+    font-size: 14px;
+  }
+
+  .add-product-btn {
+    width: 28px;
+    height: 28px;
+
+    right: 5px;
+    bottom: 5px;
+
+    font-size: 17px;
+  }
+}
+
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+.dark .noon-product-card {
+  background: #1e293b;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+.dark .noon-image-wrapper {
+  background: #334155;
+}
+
+.dark .noon-product-info h3 {
+  color: #f1f5f9;
+}
+
+.dark .no-image {
+  background: #475569;
+
+  color: #cbd5e1;
+}
+
+.dark .noon-header h2 {
+  color: #f1f5f9;
+}
+
+.dark .add-product-btn {
+  background: #ffffff;
+
+  color: #000000;
+}
+
+.dark .add-product-btn:hover {
+  background: #e5e7eb;
+}
+```
