@@ -1,12 +1,13 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "https://backend-women-ecommerce.onrender.com/api",
+  baseURL: "https://backend-women-ecommerce.onrender.com",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// Attach token automatically if user is logged in
 instance.interceptors.request.use(
   (config) => {
     const savedUser = localStorage.getItem("user");
@@ -19,10 +20,7 @@ instance.interceptors.request.use(
           config.headers.Authorization = `Bearer ${user.token}`;
         }
       } catch (error) {
-        console.error(
-          "Invalid user data in localStorage:",
-          error
-        );
+        console.error("Invalid user data in localStorage:", error);
       }
     }
 
