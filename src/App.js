@@ -33,6 +33,7 @@ import LegalPage from "./pages/LegalPage.jsx";
 // ADMIN
 // =========================
 import AdminRoute from "./pages/admin/AdminRoute.jsx";
+import AdminLogin from "./pages/admin/AdminLogin.jsx";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -43,7 +44,6 @@ import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import AssignProductToCategory from "./pages/admin/Categories/AssignProductToCategory.jsx";
 import Categories from "./pages/admin/Categories/Categories.jsx";
 import ProductsPage from "./pages/admin/Categories/ProductsPage.jsx";
-
 
 // =========================
 // APP
@@ -121,7 +121,10 @@ function App() {
           element={<MyOrders />}
         />
 
-        {/* AUTH */}
+        {/* ==================================================
+            USER AUTH
+        ================================================== */}
+
         <Route
           path="/login"
           element={<Login />}
@@ -162,12 +165,36 @@ function App() {
 
 
       {/* ==================================================
+          ADMIN LOGIN
+          
+          IMPORTANT:
+          This is separate from the normal customer login.
+          
+          Customer:
+          /login
+          
+          Admin:
+          /admin/login
+      ================================================== */}
+
+      <Route
+        path="/admin/login"
+        element={<AdminLogin />}
+      />
+
+
+      {/* ==================================================
           ADMIN PANEL
+          
+          AdminRoute protects all /admin/* pages.
       ================================================== */}
 
       <Route element={<AdminRoute />}>
 
-        {/* ADMIN DASHBOARD */}
+        {/* ==================================================
+            ADMIN DASHBOARD
+        ================================================== */}
+
         <Route
           path="/admin"
           element={
@@ -178,7 +205,10 @@ function App() {
         />
 
 
-        {/* PRODUCTS */}
+        {/* ==================================================
+            PRODUCTS
+        ================================================== */}
+
         <Route
           path="/admin/products"
           element={
@@ -189,7 +219,10 @@ function App() {
         />
 
 
-        {/* CATEGORIES */}
+        {/* ==================================================
+            CATEGORIES
+        ================================================== */}
+
         <Route
           path="/admin/categories"
           element={
@@ -200,7 +233,10 @@ function App() {
         />
 
 
-        {/* CATEGORY PRODUCTS */}
+        {/* ==================================================
+            CATEGORY PRODUCTS
+        ================================================== */}
+
         <Route
           path="/admin/ProductsPage"
           element={
@@ -211,7 +247,10 @@ function App() {
         />
 
 
-        {/* ASSIGN PRODUCT TO CATEGORY */}
+        {/* ==================================================
+            ASSIGN PRODUCT TO CATEGORY
+        ================================================== */}
+
         <Route
           path="/admin/products/assign"
           element={
@@ -222,7 +261,10 @@ function App() {
         />
 
 
-        {/* ORDERS */}
+        {/* ==================================================
+            ORDERS
+        ================================================== */}
+
         <Route
           path="/admin/orders"
           element={
@@ -233,7 +275,10 @@ function App() {
         />
 
 
-        {/* USERS */}
+        {/* ==================================================
+            USERS
+        ================================================== */}
+
         <Route
           path="/admin/users"
           element={

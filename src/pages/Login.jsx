@@ -32,24 +32,10 @@ const Login = () => {
         email: formData.email,
       });
 
-      /*
-       * axios.js already has:
-       *
-       * https://backend-women-ecommerce.onrender.com/api
-       *
-       * Therefore this request becomes:
-       *
-       * POST
-       * https://backend-women-ecommerce.onrender.com/api/auth/login
-       */
-
-      const response = await axios.post(
-        "/auth/login",
-        {
-          email: formData.email.trim(),
-          password: formData.password,
-        }
-      );
+      const response = await axios.post("/auth/login", {
+        email: formData.email.trim(),
+        password: formData.password,
+      });
 
       const data = response.data;
 
@@ -59,7 +45,10 @@ const Login = () => {
        * Make sure token exists
        */
       if (!data?.token) {
-        console.error("No token returned from server:", data);
+        console.error(
+          "No token returned from server:",
+          data
+        );
 
         alert(
           data?.message ||
@@ -70,7 +59,23 @@ const Login = () => {
       }
 
       /*
-       * Save logged-in user
+       * ADMIN IS NOT ALLOWED
+       * TO LOGIN FROM CUSTOMER LOGIN
+       */
+      if (data.role === "admin") {
+        console.warn(
+          "Admin attempted to login from customer login."
+        );
+
+        alert(
+          "Admin accounts must login from the Admin Login page."
+        );
+
+        return;
+      }
+
+      /*
+       * Save CUSTOMER only
        */
       const userData = {
         id: data.id,
@@ -85,25 +90,25 @@ const Login = () => {
         JSON.stringify(userData)
       );
 
-      console.log("USER SAVED:", userData);
+      console.log(
+        "CUSTOMER USER SAVED:",
+        userData
+      );
 
       alert("Login Successful ✅");
 
       /*
-       * Redirect according to user role
+       * CUSTOMER ALWAYS GOES TO HOME
        */
-      if (data.role === "admin") {
-        navigate("/admin", {
-          replace: true,
-        });
-      } else {
-        navigate("/", {
-          replace: true,
-        });
-      }
+      navigate("/", {
+        replace: true,
+      });
 
     } catch (error) {
-      console.error("LOGIN ERROR:", error);
+      console.error(
+        "LOGIN ERROR:",
+        error
+      );
 
       console.error(
         "STATUS:",
@@ -115,22 +120,32 @@ const Login = () => {
         error.response?.data
       );
 
-      let message = "Server connection error";
+      let message =
+        "Server connection error";
 
       if (error.response?.data?.message) {
-        message = error.response.data.message;
-      } else if (error.response?.status === 404) {
+        message =
+          error.response.data.message;
+      } else if (
+        error.response?.status === 404
+      ) {
         message =
           "Login endpoint not found. Check backend API route.";
-      } else if (error.response?.status === 400) {
+      } else if (
+        error.response?.status === 400
+      ) {
         message =
           error.response.data?.message ||
           "Invalid email or password.";
-      } else if (error.response?.status === 401) {
+      } else if (
+        error.response?.status === 401
+      ) {
         message =
           error.response.data?.message ||
           "Invalid email or password.";
-      } else if (error.response?.status >= 500) {
+      } else if (
+        error.response?.status >= 500
+      ) {
         message =
           "Backend server error. Please try again later.";
       }
@@ -149,7 +164,9 @@ const Login = () => {
 
         <h1>Welcome Back</h1>
 
-        <p>Login to your account</p>
+        <p>
+          Login to your account
+        </p>
 
         <form onSubmit={handleLogin}>
 

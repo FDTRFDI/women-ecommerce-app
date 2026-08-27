@@ -1,6 +1,8 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 const AdminRoute = () => {
+  const location = useLocation();
+
   let user = null;
 
   try {
@@ -14,17 +16,37 @@ const AdminRoute = () => {
     localStorage.removeItem("user");
   }
 
-  // المستخدم غير مسجل الدخول
+  // ==========================================
+  // NOT LOGGED IN
+  // ==========================================
+
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/admin/login"
+        state={{ from: location }}
+        replace
+      />
+    );
   }
 
-  // المستخدم ليس Admin
+  // ==========================================
+  // LOGGED IN BUT NOT ADMIN
+  // ==========================================
+
   if (user.role !== "admin") {
-    return <Navigate to="/" replace />;
+    return (
+      <Navigate
+        to="/"
+        replace
+      />
+    );
   }
 
-  // Admin مسجل الدخول
+  // ==========================================
+  // ADMIN
+  // ==========================================
+
   return <Outlet />;
 };
 
