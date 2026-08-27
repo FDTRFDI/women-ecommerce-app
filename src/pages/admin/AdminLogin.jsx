@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "../../utils/axios";
-import "./admin.css";
+import "./AdminLogin.css";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -13,12 +12,15 @@ const AdminLogin = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+
+    setError("");
   };
 
   const handleLogin = async (e) => {
@@ -27,6 +29,7 @@ const AdminLogin = () => {
     if (loading) return;
 
     setLoading(true);
+    setError("");
 
     try {
       const response = await axios.post("/auth/login", {
@@ -38,32 +41,29 @@ const AdminLogin = () => {
 
       console.log("ADMIN LOGIN RESPONSE:", data);
 
-      // ==========================================
-      // TOKEN CHECK
-      // ==========================================
+      // ==============================
+      // CHECK TOKEN
+      // ==============================
 
       if (!data?.token) {
-        alert(
-          data?.message ||
-            "Login failed: server did not return a token."
-        );
-
+        setError("Login failed. No authentication token received.");
         return;
       }
 
-      // ==========================================
-      // ADMIN CHECK
-      // ==========================================
+      // ==============================
+      // CHECK ADMIN ROLE
+      // ==============================
 
       if (data.role !== "admin") {
-        alert("Access denied. Admin account required.");
-
+        setError(
+          "Access denied. This account is not an administrator."
+        );
         return;
       }
 
-      // ==========================================
+      // ==============================
       // SAVE ADMIN
-      // ==========================================
+      // ==============================
 
       const adminData = {
         id: data.id,
@@ -80,49 +80,28 @@ const AdminLogin = () => {
 
       console.log("ADMIN SAVED:", adminData);
 
-      alert("Admin Login Successful ✅");
+      // ==============================
+      // GO TO ADMIN DASHBOARD
+      // ==============================
 
-      // ==========================================
-      // REDIRECT
-      // ==========================================
-
-      const from =
-        location.state?.from?.pathname || "/admin";
-
-      navigate(from, {
+      navigate("/admin", {
         replace: true,
       });
 
     } catch (error) {
       console.error("ADMIN LOGIN ERROR:", error);
 
-      console.error(
-        "STATUS:",
-        error.response?.status
-      );
-
-      console.error(
-        "DATA:",
-        error.response?.data
-      );
-
-      let message = "Server connection error.";
-
       if (error.response?.data?.message) {
-        message = error.response.data.message;
+        setError(error.response.data.message);
       } else if (error.response?.status === 401) {
-        message = "Invalid email or password.";
+        setError("Invalid email or password.");
       } else if (error.response?.status === 403) {
-        message = "Admin access denied.";
-      } else if (error.response?.status === 404) {
-        message =
-          "Login endpoint not found. Check backend API.";
+        setError("You do not have admin access.");
       } else if (error.response?.status >= 500) {
-        message =
-          "Backend server error. Please try again later.";
+        setError("Server error. Please try again later.");
+      } else {
+        setError("Unable to connect to the server.");
       }
-
-      alert(message);
 
     } finally {
       setLoading(false);
@@ -132,82 +111,159 @@ const AdminLogin = () => {
   return (
     <div className="admin-login-page">
 
-      <div className="admin-login-box">
+      {/* BACKGROUND DECORATION */}
+      <div className="admin-bg-circle circle-one"></div>
+      <div className="admin-bg-circle circle-two"></div>
 
-        <div className="admin-login-header">
+      <div className="admin-login-container">
+
+        {/* LOGO / BRAND */}
+        <div className="admin-login-brand">
+
+          <div className="admin-logo">
+            O
+          </div>
+
+          <div>
+            <h1>Omnera</h1>
+            <span>Administration</span>
+          </div>
+
+        </div>
+
+        {/* LOGIN CARD */}
+        <div className="admin-login-card">
 
           <div className="admin-login-icon">
             🔐
           </div>
 
-          <h1>
-            Admin Login
-          </h1>
+          <h2>Admin Login</h2>
 
-          <p>
+          <p className="admin-login-subtitle">
             Sign in to access the administration panel
           </p>
 
-        </div>
+          {/* ERROR */}
+          {error && (
+            <div className="admin-login-error">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+          )}
 
-        <form onSubmit={handleLogin}>
+          {/* FORM */}
+          <form onSubmit={handleLogin}>
 
-          <div className="admin-form-group">
+            {/* EMAIL */}
+            <div className="admin-input-group">
 
-            <label>
-              Email Address
-            </label>
+              <label htmlFor="email">
+                Email Address
+              </label>
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Admin email"
-              value={formData.email}
-              onChange={handleChange}
-              autoComplete="email"
-              required
-            />
+              <div className="admin-input-wrapper">
+
+                <span className="admin-input-icon">
+                  ✉
+                </span>
+
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="Enter admin email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  autoComplete="email"
+                  required
+                />
+
+              </div>
+
+            </div>
+
+            {/* PASSWORD */}
+            <div className="admin-input-group">
+
+              <label htmlFor="password">
+                Password
+              </label>
+
+              <div className="admin-input-wrapper">
+
+                <span className="admin-input-icon">
+                  🔑
+                </span>
+
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="Enter admin password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  autoComplete="current-password"
+                  required
+                />
+
+              </div>
+
+            </div>
+
+            {/* LOGIN BUTTON */}
+            <button
+              type="submit"
+              className="admin-login-button"
+              disabled={loading}
+            >
+
+              {loading ? (
+                <>
+                  <span className="admin-spinner"></span>
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Login as Admin
+                  <span>→</span>
+                </>
+              )}
+
+            </button>
+
+          </form>
+
+          {/* SECURITY MESSAGE */}
+          <div className="admin-security">
+
+            <span>🔒</span>
+
+            <div>
+              <strong>Secure Access</strong>
+
+              <p>
+                This area is restricted to authorized
+                administrators only.
+              </p>
+            </div>
 
           </div>
 
-          <div className="admin-form-group">
-
-            <label>
-              Password
-            </label>
-
-            <input
-              type="password"
-              name="password"
-              placeholder="Admin password"
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="current-password"
-              required
-            />
-
-          </div>
-
-          <button
-            type="submit"
-            className="admin-login-btn"
-            disabled={loading}
-          >
-            {loading
-              ? "Signing in..."
-              : "Login as Admin"}
-          </button>
-
-        </form>
-
-        <div className="admin-login-footer">
-          <button
-            type="button"
-            onClick={() => navigate("/")}
+          {/* BACK TO WEBSITE */}
+          <Link
+            to="/"
+            className="admin-back-link"
           >
             ← Back to Website
-          </button>
+          </Link>
+
         </div>
+
+        {/* FOOTER */}
+        <p className="admin-login-footer">
+          © {new Date().getFullYear()} Omnera. All rights reserved.
+        </p>
 
       </div>
 
