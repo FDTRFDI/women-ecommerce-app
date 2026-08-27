@@ -1,13 +1,12 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "https://backend-women-ecommerce.onrender.com",
+  baseURL: "https://backend-women-ecommerce.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Attach token automatically if user is logged in
 instance.interceptors.request.use(
   (config) => {
     const savedUser = localStorage.getItem("user");
