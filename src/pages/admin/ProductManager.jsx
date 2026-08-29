@@ -1,167 +1,105 @@
 import { useEffect, useState } from "react";
-import axios from "../../utils/axios";
-import "./admin.css";
+import axios from "axios";
 
 const API = "https://backend-women-ecommerce.onrender.com";
 
-const ProductManager = () => {
+function ProductManager() {
   // =========================================================
-  // EMPTY FORM
+  // STATE
   // =========================================================
-  const emptyForm = {
-    title: "",
-    price: "",
-    description: "",
-    category_id: "",
-    main_image: null,
-    gallery: [],
-    colors: [],
-  };
 
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-
-  const [form, setForm] = useState(emptyForm);
-
-  const [editingId, setEditingId] = useState(null);
-  const [token, setToken] = useState("");
-
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(true);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+
+  const [mainImage, setMainImage] = useState(null);
+  const [galleryImages, setGalleryImages] = useState([]);
 
   const [colorInput, setColorInput] = useState("");
+  const [colors, setColors] = useState([]);
+
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   // =========================================================
-  // LOAD USER + PRODUCTS + CATEGORIES
+  // GET TOKEN
   // =========================================================
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
 
-    if (savedUser) {
-      try {
-        const parsed = JSON.parse(savedUser);
+  const getToken = () => {
+    try {
+      const admin = localStorage.getItem("admin");
 
-        if (parsed?.token) {
-          setToken(parsed.token);
-        }
-      } catch (err) {
-        console.error("Invalid user data:", err);
-      }
+      if (!admin) return null;
+
+      const parsed = JSON.parse(admin);
+
+      return parsed?.token || null;
+    } catch (err) {
+      console.error("Token error:", err);
+      return null;
     }
-
-    fetchProducts();
-    fetchCategories();
-  }, []);
+  };
 
   // =========================================================
-  // GET PRODUCTS
+  // GET ALL PRODUCTS
   // =========================================================
+
   const fetchProducts = async () => {
     try {
       setLoadingProducts(true);
 
-      const { data } = await axios.get("/api/category-products");
+      const response = await axios.get(`${API}/api/products`);
+
+      const data = response.data;
 
       const list = Array.isArray(data)
         ? data
-        : Array.isArray(data?.data)
+        : Array.isArray(data.data)
         ? data.data
+        : Array.isArray(data.products)
+        ? data.products
         : [];
 
       setProducts(list);
     } catch (err) {
-      console.error("Error fetching category products:", err);
+      console.error("GET PRODUCTS ERROR:", err);
 
       setProducts([]);
+
+      setError("Error loading products");
     } finally {
       setLoadingProducts(false);
     }
   };
 
   // =========================================================
-  // GET CATEGORIES
+  // LOAD PRODUCTS
   // =========================================================
-  const fetchCategories = async () => {
-    try {
-      setLoadingCategories(true);
 
-      const { data } = await axios.get("/api/categories");
-
-      const list = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.data)
-        ? data.data
-        : Array.isArray(data?.categories)
-        ? data.categories
-        : [];
-
-      setCategories(list);
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-
-      setCategories([]);
-    } finally {
-      setLoadingCategories(false);
-    }
-  };
-
-  // =========================================================
-  // HANDLE INPUT
-  // =========================================================
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // =========================================================
-  // MAIN IMAGE
-  // =========================================================
-  const handleMainImage = (e) => {
-    const file = e.target.files?.[0] || null;
-
-    setForm((prev) => ({
-      ...prev,
-      main_image: file,
-    }));
-  };
-
-  // =========================================================
-  // GALLERY
-  // =========================================================
-  const handleGallery = (e) => {
-    const files = Array.from(e.target.files || []);
-
-    setForm((prev) => ({
-      ...prev,
-      gallery: files,
-    }));
-  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   // =========================================================
   // ADD COLOR
   // =========================================================
+
   const addColor = () => {
     const color = colorInput.trim();
 
     if (!color) return;
 
-    if (form.colors.includes(color)) {
+    if (colors.includes(color)) {
       setColorInput("");
       return;
     }
 
-    setForm((prev) => ({
-      ...prev,
-      colors: [...prev.colors, color],
-    }));
+    setColors((prev) => [...prev, color]);
 
     setColorInput("");
   };
@@ -169,182 +107,134 @@ const ProductManager = () => {
   // =========================================================
   // REMOVE COLOR
   // =========================================================
-  const removeColor = (index) => {
-    setForm((prev) => ({
-      ...prev,
-      colors: prev.colors.filter((_, i) => i !== index),
-    }));
+
+  const removeColor = (colorToRemove) => {
+    setColors((prev) =>
+      prev.filter((color) => color !== colorToRemove)
+    );
   };
 
   // =========================================================
-  // SUBMIT PRODUCT
+  // ADD PRODUCT
   // =========================================================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setMessage("");
     setError("");
-    setSuccess("");
-
-    // -------------------------------------------------------
-    // LOGIN CHECK
-    // -------------------------------------------------------
-    if (!token) {
-      setError("Admin login required.");
-      return;
-    }
 
     // -------------------------------------------------------
     // VALIDATION
     // -------------------------------------------------------
-    if (!form.title.trim()) {
-      setError("Product title is required.");
+
+    if (!name.trim()) {
+      setError("Please enter product name");
       return;
     }
 
-    if (!form.price) {
-      setError("Product price is required.");
+    if (!price || Number(price) < 0) {
+      setError("Please enter a valid price");
       return;
     }
 
-    if (!form.category_id) {
-      setError("Please select a category.");
+    if (!mainImage) {
+      setError("Please select a main image");
       return;
     }
-
-    // -------------------------------------------------------
-    // CREATE FORM DATA
-    // -------------------------------------------------------
-    const formData = new FormData();
-
-    formData.append("title", form.title.trim());
-
-    formData.append(
-      "price",
-      form.price
-    );
-
-    formData.append(
-      "description",
-      form.description || ""
-    );
-
-    formData.append(
-      "category_id",
-      form.category_id
-    );
-
-    // -------------------------------------------------------
-    // MAIN IMAGE
-    // Backend expects:
-    // main_image
-    // -------------------------------------------------------
-    if (form.main_image) {
-      formData.append(
-        "main_image",
-        form.main_image
-      );
-    }
-
-    // -------------------------------------------------------
-    // GALLERY
-    // Backend expects:
-    // gallery
-    // -------------------------------------------------------
-    form.gallery.forEach((file) => {
-      formData.append(
-        "gallery",
-        file
-      );
-    });
-
-    // -------------------------------------------------------
-    // COLORS
-    // Backend accepts repeated colors
-    // -------------------------------------------------------
-    form.colors.forEach((color) => {
-      formData.append(
-        "colors",
-        color
-      );
-    });
 
     try {
       setLoading(true);
 
-      console.log("==============================");
-      console.log(
-        editingId
-          ? "UPDATING CATEGORY PRODUCT"
-          : "CREATING CATEGORY PRODUCT"
+      const formData = new FormData();
+
+      // IMPORTANT:
+      // These names MUST match the backend:
+      // image
+      // images
+      // colors
+
+      formData.append("name", name.trim());
+
+      formData.append("price", price);
+
+      formData.append(
+        "description",
+        description.trim()
       );
 
-      console.log("TITLE:", form.title);
-      console.log("PRICE:", form.price);
-      console.log("CATEGORY ID:", form.category_id);
-      console.log("COLORS:", form.colors);
-      console.log("MAIN IMAGE:", form.main_image);
-      console.log("GALLERY:", form.gallery);
-      console.log("==============================");
+      // MAIN IMAGE
+      formData.append("image", mainImage);
 
-      // =====================================================
-      // UPDATE
-      // =====================================================
-      if (editingId) {
-        await axios.put(
-          `/api/category-products/${editingId}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      // GALLERY
+      galleryImages.forEach((file) => {
+        formData.append("images", file);
+      });
 
-        setSuccess(
-          "Product updated successfully."
-        );
-      }
+      // COLORS
+      formData.append(
+        "colors",
+        JSON.stringify(colors)
+      );
 
-      // =====================================================
-      // ADD
-      // =====================================================
-      else {
-        await axios.post(
-          "/api/category-products",
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      const token = getToken();
 
-        setSuccess(
-          "Product added successfully."
-        );
-      }
+      const response = await axios.post(
+        `${API}/api/products`,
+        formData,
+        {
+          headers: {
+            ...(token
+              ? {
+                  Authorization: `Bearer ${token}`,
+                }
+              : {}),
+          },
+        }
+      );
 
-      // =====================================================
-      // RESET
-      // =====================================================
-      setForm(emptyForm);
-      setEditingId(null);
+      console.log(
+        "PRODUCT CREATED:",
+        response.data
+      );
+
+      setMessage("Product added successfully");
+
+      // -------------------------------------------------------
+      // CLEAR FORM
+      // -------------------------------------------------------
+
+      setName("");
+      setPrice("");
+      setDescription("");
+
+      setMainImage(null);
+      setGalleryImages([]);
+
+      setColors([]);
       setColorInput("");
 
-      // =====================================================
-      // REFRESH PRODUCT LIST
-      // =====================================================
+      // Reset file inputs
+      const fileInputs =
+        document.querySelectorAll(
+          'input[type="file"]'
+        );
+
+      fileInputs.forEach((input) => {
+        input.value = "";
+      });
+
+      // -------------------------------------------------------
+      // IMPORTANT
+      // GET PRODUCTS AGAIN
+      // -------------------------------------------------------
+
       await fetchProducts();
 
     } catch (err) {
       console.error(
-        "Error submitting category product:",
+        "ADD PRODUCT ERROR:",
         err
-      );
-
-      console.error(
-        "STATUS:",
-        err.response?.status
       );
 
       console.error(
@@ -354,8 +244,7 @@ const ProductManager = () => {
 
       setError(
         err.response?.data?.message ||
-        err.response?.data?.error ||
-        "Server error while saving product."
+          "Error saving product"
       );
     } finally {
       setLoading(false);
@@ -363,106 +252,52 @@ const ProductManager = () => {
   };
 
   // =========================================================
-  // EDIT PRODUCT
-  // =========================================================
-  const editProduct = (product) => {
-    setEditingId(product.id);
-
-    let colors = [];
-
-    if (Array.isArray(product.colors)) {
-      colors = product.colors;
-    }
-
-    setForm({
-      title:
-        product.title ||
-        "",
-
-      price:
-        product.price ||
-        "",
-
-      description:
-        product.description ||
-        "",
-
-      category_id:
-        product.category_id ||
-        "",
-
-      main_image: null,
-
-      gallery: [],
-
-      colors,
-    });
-
-    setError("");
-    setSuccess("");
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  // =========================================================
-  // CANCEL EDIT
-  // =========================================================
-  const cancelEdit = () => {
-    setEditingId(null);
-    setForm(emptyForm);
-    setColorInput("");
-    setError("");
-    setSuccess("");
-  };
-
-  // =========================================================
   // DELETE PRODUCT
   // =========================================================
-  const deleteProduct = async (id) => {
-    if (!token) {
-      alert("Admin login required.");
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this product?")) {
       return;
     }
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-
-    if (!confirmed) return;
-
     try {
+      setError("");
+      setMessage("");
+
+      const token = getToken();
+
       await axios.delete(
-        `/api/category-products/${id}`,
+        `${API}/api/products/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...(token
+              ? {
+                  Authorization: `Bearer ${token}`,
+                }
+              : {}),
           },
         }
       );
 
-      setProducts((prev) =>
-        prev.filter(
-          (product) =>
-            Number(product.id) !== Number(id)
-        )
-      );
+      setMessage("Product deleted successfully");
 
-      setSuccess(
-        "Product deleted successfully."
-      );
+      // Refresh list
+      await fetchProducts();
 
     } catch (err) {
       console.error(
-        "Error deleting product:",
+        "DELETE PRODUCT ERROR:",
         err
+      );
+
+      console.error(
+        "SERVER RESPONSE:",
+        err.response?.data
       );
 
       setError(
         err.response?.data?.message ||
-        "Error deleting product."
+          "Error deleting product"
       );
     }
   };
@@ -470,23 +305,9 @@ const ProductManager = () => {
   // =========================================================
   // IMAGE URL
   // =========================================================
-  const getImage = (product) => {
-    let image = "";
 
-    if (product.main_image) {
-      image = product.main_image;
-    } else if (product.image) {
-      image = product.image;
-    } else if (
-      Array.isArray(product.gallery) &&
-      product.gallery.length > 0
-    ) {
-      image = product.gallery[0];
-    }
-
-    if (!image) {
-      return "";
-    }
+  const getImageUrl = (image) => {
+    if (!image) return "";
 
     if (
       image.startsWith("http://") ||
@@ -499,395 +320,504 @@ const ProductManager = () => {
       return `${API}${image}`;
     }
 
-    return `${API}/${image}`;
-  };
-
-  // =========================================================
-  // CATEGORY NAME
-  // =========================================================
-  const getCategoryName = (categoryId) => {
-    const category = categories.find(
-      (cat) =>
-        Number(cat.id) === Number(categoryId)
-    );
-
-    return (
-      category?.title ||
-      category?.name ||
-      `Category ${categoryId || "-"}`
-    );
+    return `${API}/uploads/${image}`;
   };
 
   // =========================================================
   // RENDER
   // =========================================================
+
   return (
-    <div className="admin-dashboard-container">
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "1100px",
+        margin: "0 auto",
+        padding: "30px",
+        boxSizing: "border-box",
+      }}
+    >
 
       {/* =====================================================
-          HEADER
+          TITLE
       ===================================================== */}
-      <div className="admin-dashboard-header">
 
-        <div>
-          <h1 className="admin-title">
-            Manage Products
-          </h1>
+      <h1
+        style={{
+          marginBottom: "10px",
+        }}
+      >
+        Manage Products
+      </h1>
 
-          <p>
-            Add products that appear directly inside
-            your selected category.
-          </p>
-        </div>
+      <p
+        style={{
+          marginBottom: "25px",
+          color: "#555",
+        }}
+      >
+        Add products that appear directly on your store.
+      </p>
 
-        <button
-          type="button"
-          className="btn primary"
-          onClick={() => {
-            fetchProducts();
-            fetchCategories();
+      {/* =====================================================
+          REFRESH
+      ===================================================== */}
+
+      <button
+        type="button"
+        onClick={fetchProducts}
+        disabled={loadingProducts}
+        style={{
+          marginBottom: "20px",
+          padding: "10px 18px",
+          border: "none",
+          borderRadius: "6px",
+          background: "#007bff",
+          color: "#fff",
+          cursor: "pointer",
+        }}
+      >
+        {loadingProducts
+          ? "Loading..."
+          : "Refresh"}
+      </button>
+
+      {/* =====================================================
+          MESSAGE
+      ===================================================== */}
+
+      {message && (
+        <div
+          style={{
+            padding: "12px",
+            marginBottom: "15px",
+            borderRadius: "6px",
+            background: "#d4edda",
+            color: "#155724",
           }}
         >
-          Refresh
-        </button>
-
-      </div>
+          {message}
+        </div>
+      )}
 
       {/* =====================================================
           ERROR
       ===================================================== */}
+
       {error && (
-        <div className="admin-error">
+        <div
+          style={{
+            padding: "12px",
+            marginBottom: "15px",
+            borderRadius: "6px",
+            background: "#f8d7da",
+            color: "#721c24",
+          }}
+        >
           {error}
         </div>
       )}
 
       {/* =====================================================
-          SUCCESS
+          ADD PRODUCT FORM
       ===================================================== */}
-      {success && (
-        <div
-          style={{
-            padding: "12px 16px",
-            marginBottom: "20px",
-            borderRadius: "8px",
-            background: "#e8f8ee",
-            color: "#187a3d",
-            border: "1px solid #b8e5c8",
-            fontWeight: "600",
-          }}
-        >
-          {success}
-        </div>
-      )}
 
-      {/* =====================================================
-          FORM
-      ===================================================== */}
-      <form
-        className="admin-form"
-        onSubmit={handleSubmit}
+      <div
+        style={{
+          background: "#fff",
+          padding: "25px",
+          borderRadius: "10px",
+          boxShadow:
+            "0 2px 12px rgba(0,0,0,0.08)",
+          marginBottom: "40px",
+        }}
       >
 
-        <h2>
-          {editingId
-            ? "Edit Product"
-            : "Add Product"}
-        </h2>
+        <h2>Add Product</h2>
 
-        {/* TITLE */}
-        <label>
-          Product Title
-        </label>
+        <form onSubmit={handleSubmit}>
 
-        <input
-          type="text"
-          name="title"
-          placeholder="Product Title"
-          value={form.title}
-          onChange={handleChange}
-          required
-        />
+          {/* PRODUCT NAME */}
 
-        {/* PRICE */}
-        <label>
-          Price
-        </label>
+          <div style={{ marginBottom: "15px" }}>
+            <label>
+              <strong>Product Name</strong>
+            </label>
 
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          value={form.price}
-          onChange={handleChange}
-          min="0"
-          step="0.01"
-          required
-        />
-
-        {/* DESCRIPTION */}
-        <label>
-          Description
-        </label>
-
-        <textarea
-          name="description"
-          placeholder="Product Description"
-          value={form.description}
-          onChange={handleChange}
-          rows="5"
-        />
-
-        {/* CATEGORY */}
-        <label>
-          Category
-        </label>
-
-        <select
-          name="category_id"
-          value={form.category_id}
-          onChange={handleChange}
-          required
-          disabled={loadingCategories}
-        >
-
-          <option value="">
-            {loadingCategories
-              ? "Loading categories..."
-              : "Select Category"}
-          </option>
-
-          {categories.map((category) => (
-            <option
-              key={category.id}
-              value={category.id}
-            >
-              {category.title ||
-                category.name ||
-                `Category ${category.id}`}
-            </option>
-          ))}
-
-        </select>
-
-        {/* MAIN IMAGE */}
-        <label>
-          Main Image
-        </label>
-
-        <input
-          type="file"
-          name="main_image"
-          accept="image/*"
-          onChange={handleMainImage}
-        />
-
-        {form.main_image && (
-          <small>
-            Selected: {form.main_image.name}
-          </small>
-        )}
-
-        {/* GALLERY */}
-        <label>
-          Gallery Images
-        </label>
-
-        <input
-          type="file"
-          name="gallery"
-          accept="image/*"
-          multiple
-          onChange={handleGallery}
-        />
-
-        {form.gallery.length > 0 && (
-          <small>
-            {form.gallery.length} gallery image(s)
-            selected
-          </small>
-        )}
-
-        {/* COLORS */}
-        <h3>
-          Colors
-        </h3>
-
-        <div className="admin-forms-row">
-
-          <input
-            type="text"
-            value={colorInput}
-            onChange={(e) =>
-              setColorInput(e.target.value)
-            }
-            placeholder="Add Color"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addColor();
+            <input
+              type="text"
+              placeholder="Product Name"
+              value={name}
+              onChange={(e) =>
+                setName(e.target.value)
               }
-            }}
-          />
+              style={{
+                width: "100%",
+                padding: "12px",
+                marginTop: "6px",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
 
-          <button
-            type="button"
-            className="btn primary"
-            onClick={addColor}
-          >
-            Add
-          </button>
+          {/* PRICE */}
 
-        </div>
+          <div style={{ marginBottom: "15px" }}>
+            <label>
+              <strong>Price</strong>
+            </label>
 
-        {/* COLOR TAGS */}
-        <div className="tag-list">
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Price"
+              value={price}
+              onChange={(e) =>
+                setPrice(e.target.value)
+              }
+              style={{
+                width: "100%",
+                padding: "12px",
+                marginTop: "6px",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
 
-          {form.colors.map(
-            (color, index) => (
-              <span
-                key={`${color}-${index}`}
-                className="tag"
+          {/* DESCRIPTION */}
+
+          <div style={{ marginBottom: "15px" }}>
+            <label>
+              <strong>Description</strong>
+            </label>
+
+            <textarea
+              placeholder="Product Description"
+              value={description}
+              onChange={(e) =>
+                setDescription(e.target.value)
+              }
+              rows="5"
+              style={{
+                width: "100%",
+                padding: "12px",
+                marginTop: "6px",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          {/* =================================================
+              MAIN IMAGE
+          ================================================= */}
+
+          <div style={{ marginBottom: "15px" }}>
+            <label>
+              <strong>Main Image</strong>
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setMainImage(
+                  e.target.files?.[0] || null
+                )
+              }
+              style={{
+                display: "block",
+                marginTop: "8px",
+              }}
+            />
+
+            {mainImage && (
+              <small>
+                Selected: {mainImage.name}
+              </small>
+            )}
+          </div>
+
+          {/* =================================================
+              GALLERY
+          ================================================= */}
+
+          <div style={{ marginBottom: "15px" }}>
+            <label>
+              <strong>Gallery Images</strong>
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) =>
+                setGalleryImages(
+                  Array.from(
+                    e.target.files || []
+                  )
+                )
+              }
+              style={{
+                display: "block",
+                marginTop: "8px",
+              }}
+            />
+
+            {galleryImages.length > 0 && (
+              <div
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
+                  marginTop: "8px",
                 }}
               >
+                {galleryImages.length} gallery image(s)
+                selected
+              </div>
+            )}
+          </div>
 
-                {color}
+          {/* =================================================
+              COLORS
+          ================================================= */}
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    removeColor(index)
+          <div style={{ marginBottom: "20px" }}>
+            <label>
+              <strong>Colors</strong>
+            </label>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "8px",
+                marginTop: "8px",
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Add Color"
+                value={colorInput}
+                onChange={(e) =>
+                  setColorInput(e.target.value)
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addColor();
                   }
-                  style={{
-                    border: "none",
-                    background: "transparent",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                  }}
-                >
-                  ×
-                </button>
+                }}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                }}
+              />
 
-              </span>
-            )
-          )}
+              <button
+                type="button"
+                onClick={addColor}
+                style={{
+                  padding: "10px 18px",
+                  border: "none",
+                  borderRadius: "5px",
+                  background: "#007bff",
+                  color: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                Add
+              </button>
+            </div>
 
-        </div>
+            {/* COLORS LIST */}
 
-        {/* BUTTONS */}
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginTop: "20px",
-          }}
-        >
+            {colors.length > 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                  marginTop: "12px",
+                }}
+              >
+                {colors.map((color) => (
+                  <span
+                    key={color}
+                    style={{
+                      background: "#007bff",
+                      color: "#fff",
+                      padding:
+                        "5px 10px",
+                      borderRadius: "15px",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() =>
+                      removeColor(color)
+                    }
+                    title="Click to remove"
+                  >
+                    {color} ×
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* =================================================
+              SUBMIT
+          ================================================= */}
 
           <button
             type="submit"
-            className="btn success"
             disabled={loading}
+            style={{
+              width: "100%",
+              padding: "13px",
+              border: "none",
+              borderRadius: "6px",
+              background: "#28a745",
+              color: "#fff",
+              fontSize: "16px",
+              cursor: loading
+                ? "not-allowed"
+                : "pointer",
+            }}
           >
             {loading
-              ? "Saving..."
-              : editingId
-              ? "Update Product"
+              ? "Adding Product..."
               : "Add Product"}
           </button>
 
-          {editingId && (
-            <button
-              type="button"
-              className="btn"
-              onClick={cancelEdit}
-            >
-              Cancel
-            </button>
-          )}
-
-        </div>
-
-      </form>
+        </form>
+      </div>
 
       {/* =====================================================
           PRODUCTS LIST
       ===================================================== */}
-      <div className="admin-dashboard-header">
 
-        <div>
-          <h2 className="admin-section-title">
-            Products List
-          </h2>
+      <div>
 
-          <p>
-            Products stored in category_products.
-          </p>
-        </div>
+        <h2>Products List</h2>
 
-      </div>
+        <p
+          style={{
+            color: "#555",
+            marginBottom: "15px",
+          }}
+        >
+          All products added to the store.
+        </p>
 
-      <div className="admin-table-wrapper">
+        {loadingProducts ? (
 
-        <table className="admin-table">
+          <p>Loading products...</p>
 
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Title</th>
-              <th>Price</th>
-              <th>Category</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+        ) : products.length === 0 ? (
 
-          <tbody>
+          <div
+            style={{
+              padding: "25px",
+              background: "#fff",
+              borderRadius: "8px",
+            }}
+          >
+            No products found.
+          </div>
 
-            {loadingProducts ? (
+        ) : (
 
-              <tr>
-                <td colSpan="5">
-                  Loading products...
-                </td>
-              </tr>
+          <div
+            style={{
+              overflowX: "auto",
+              background: "#fff",
+              borderRadius: "8px",
+              boxShadow:
+                "0 2px 10px rgba(0,0,0,0.06)",
+            }}
+          >
 
-            ) : products.length === 0 ? (
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+              }}
+            >
 
-              <tr>
-                <td colSpan="5">
-                  No products found.
-                </td>
-              </tr>
+              <thead>
+                <tr
+                  style={{
+                    background: "#f5f5f5",
+                  }}
+                >
+                  <th
+                    style={{
+                      padding: "14px",
+                      textAlign: "left",
+                    }}
+                  >
+                    Image
+                  </th>
 
-            ) : (
+                  <th
+                    style={{
+                      padding: "14px",
+                      textAlign: "left",
+                    }}
+                  >
+                    Title
+                  </th>
 
-              products.map((product) => {
+                  <th
+                    style={{
+                      padding: "14px",
+                      textAlign: "left",
+                    }}
+                  >
+                    Price
+                  </th>
 
-                const imageUrl =
-                  getImage(product);
+                  <th
+                    style={{
+                      padding: "14px",
+                      textAlign: "left",
+                    }}
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
 
-                return (
-                  <tr key={product.id}>
+              <tbody>
+
+                {products.map((product) => (
+
+                  <tr
+                    key={product.id}
+                    style={{
+                      borderTop:
+                        "1px solid #eee",
+                    }}
+                  >
 
                     {/* IMAGE */}
-                    <td>
 
-                      {imageUrl ? (
+                    <td
+                      style={{
+                        padding: "12px",
+                      }}
+                    >
+
+                      {product.image ? (
 
                         <img
-                          src={imageUrl}
-                          alt={
-                            product.title ||
-                            "Product"
-                          }
-                          width="70"
-                          height="70"
+                          src={getImageUrl(
+                            product.image
+                          )}
+                          alt={product.name}
                           style={{
+                            width: "70px",
+                            height: "70px",
                             objectFit: "cover",
-                            borderRadius: "8px",
+                            borderRadius: "6px",
                           }}
                           onError={(e) => {
                             e.currentTarget.style.display =
@@ -906,77 +836,75 @@ const ProductManager = () => {
                     </td>
 
                     {/* TITLE */}
-                    <td>
-                      {product.title || "-"}
+
+                    <td
+                      style={{
+                        padding: "12px",
+                      }}
+                    >
+                      {product.name}
                     </td>
 
                     {/* PRICE */}
-                    <td>
+
+                    <td
+                      style={{
+                        padding: "12px",
+                      }}
+                    >
+                      AED{" "}
                       {Number(
                         product.price || 0
-                      ).toFixed(2)}{" "}
-                      AED
-                    </td>
-
-                    {/* CATEGORY */}
-                    <td>
-                      {getCategoryName(
-                        product.category_id
-                      )}
+                      ).toFixed(2)}
                     </td>
 
                     {/* ACTIONS */}
-                    <td>
 
-                      <div
+                    <td
+                      style={{
+                        padding: "12px",
+                      }}
+                    >
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDelete(
+                            product.id
+                          )
+                        }
                         style={{
-                          display: "flex",
-                          gap: "8px",
-                          flexWrap: "wrap",
+                          padding:
+                            "8px 14px",
+                          border: "none",
+                          borderRadius: "5px",
+                          background:
+                            "#dc3545",
+                          color: "#fff",
+                          cursor: "pointer",
                         }}
                       >
-
-                        <button
-                          type="button"
-                          className="btn primary small"
-                          onClick={() =>
-                            editProduct(
-                              product
-                            )
-                          }
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn danger small"
-                          onClick={() =>
-                            deleteProduct(
-                              product.id
-                            )
-                          }
-                        >
-                          Delete
-                        </button>
-
-                      </div>
+                        Delete
+                      </button>
 
                     </td>
 
                   </tr>
-                );
-              })
-            )}
 
-          </tbody>
+                ))}
 
-        </table>
+              </tbody>
+
+            </table>
+
+          </div>
+
+        )}
 
       </div>
 
     </div>
   );
-};
+}
 
 export default ProductManager;

@@ -10,7 +10,7 @@ function ProductSections() {
   const [error, setError] = useState("");
 
   // =========================================================
-  // GET ALL CATEGORY PRODUCTS
+  // GET ALL PRODUCTS
   // =========================================================
   useEffect(() => {
     let mounted = true;
@@ -21,16 +21,16 @@ function ProductSections() {
         setError("");
 
         console.log("=================================");
-        console.log("GETTING CATEGORY PRODUCTS");
-        console.log(`${API}/api/category-products`);
+        console.log("GETTING ALL PRODUCTS");
+        console.log(`${API}/api/products`);
         console.log("=================================");
 
         const response = await fetch(
-          `${API}/api/category-products`
+          `${API}/api/products`
         );
 
         console.log(
-          "Category products status:",
+          "Products status:",
           response.status
         );
 
@@ -43,7 +43,7 @@ function ProductSections() {
         const data = await response.json();
 
         console.log(
-          "CATEGORY PRODUCTS RESPONSE:",
+          "PRODUCTS RESPONSE:",
           data
         );
 
@@ -65,23 +65,6 @@ function ProductSections() {
           Array.isArray(data.products)
         ) {
           list = data.products;
-        } else if (
-          data &&
-          Array.isArray(data.category_products)
-        ) {
-          list = data.category_products;
-        } else if (
-          data &&
-          data.data &&
-          Array.isArray(data.data.products)
-        ) {
-          list = data.data.products;
-        } else if (
-          data &&
-          data.data &&
-          Array.isArray(data.data.category_products)
-        ) {
-          list = data.data.category_products;
         }
 
         console.log(
@@ -89,21 +72,74 @@ function ProductSections() {
           list
         );
 
-        console.log(
-          "PRODUCT COUNT:",
-          list.length
-        );
-
         // =====================================================
-        // VALIDATE PRODUCTS
+        // CONVERT PRODUCTS TO STORE FORMAT
         // =====================================================
 
-        const validProducts = list.filter(
-          (product) =>
-            product &&
-            typeof product === "object" &&
-            !Array.isArray(product)
-        );
+        const validProducts = list
+          .filter(
+            (product) =>
+              product &&
+              typeof product === "object" &&
+              !Array.isArray(product)
+          )
+          .map((product) => {
+
+            let image = product.image || "";
+
+            // -----------------------------------------------
+            // IMAGE URL
+            // -----------------------------------------------
+
+            if (image) {
+
+              if (
+                image.startsWith("http://") ||
+                image.startsWith("https://")
+              ) {
+                // Already full URL
+              } else if (image.startsWith("/")) {
+                image = `${API}${image}`;
+              } else {
+                image = `${API}/uploads/${image}`;
+              }
+
+            }
+
+            // -----------------------------------------------
+            // RETURN STORE PRODUCT
+            // -----------------------------------------------
+
+            return {
+              ...product,
+
+              // ProductManager uses "name"
+              // ProductSection uses "title"
+              title:
+                product.title ||
+                product.name ||
+                "Product",
+
+              name:
+                product.name ||
+                product.title ||
+                "Product",
+
+              price: Number(
+                product.price || 0
+              ),
+
+              image,
+
+              main_image: image,
+
+              colors: Array.isArray(
+                product.colors
+              )
+                ? product.colors
+                : [],
+            };
+          });
 
         console.log(
           "VALID PRODUCTS:",
@@ -111,15 +147,12 @@ function ProductSections() {
         );
 
         console.log(
-          "VALID PRODUCT COUNT:",
+          "PRODUCT COUNT:",
           validProducts.length
         );
 
-        // =====================================================
-        // SHOW FIRST PRODUCT FOR DEBUGGING
-        // =====================================================
-
         if (validProducts.length > 0) {
+
           console.log(
             "FIRST PRODUCT:",
             validProducts[0]
@@ -131,14 +164,18 @@ function ProductSections() {
           );
 
           console.log(
-            "FIRST PRODUCT TITLE:",
-            validProducts[0]?.title
+            "FIRST PRODUCT NAME:",
+            validProducts[0]?.name
           );
 
           console.log(
             "FIRST PRODUCT IMAGE:",
-            validProducts[0]?.main_image ||
-              validProducts[0]?.image
+            validProducts[0]?.image
+          );
+
+          console.log(
+            "FIRST PRODUCT PRICE:",
+            validProducts[0]?.price
           );
         }
 
@@ -151,13 +188,16 @@ function ProductSections() {
         }
 
       } catch (error) {
+
         console.error(
-          "ERROR FETCHING CATEGORY PRODUCTS:",
+          "ERROR FETCHING PRODUCTS:",
           error
         );
 
         if (mounted) {
+
           setProducts([]);
+
           setError(
             error?.message ||
               "Failed to load products"
@@ -165,9 +205,11 @@ function ProductSections() {
         }
 
       } finally {
+
         if (mounted) {
           setLoading(false);
         }
+
       }
     };
 
@@ -176,38 +218,54 @@ function ProductSections() {
     return () => {
       mounted = false;
     };
+
   }, []);
 
   // =========================================================
   // LOADING
   // =========================================================
+
   if (loading) {
+
     return (
       <section className="product-section">
 
         <div className="product-section-header">
-          <h2>Best Deals</h2>
+
+          <h2>
+            Best Deals
+          </h2>
+
         </div>
 
         <div className="products-grid">
+
           <p>
             Loading products...
           </p>
+
         </div>
 
       </section>
     );
+
   }
 
   // =========================================================
   // ERROR
   // =========================================================
+
   if (error) {
+
     return (
       <section className="product-section">
 
         <div className="product-section-header">
-          <h2>Best Deals</h2>
+
+          <h2>
+            Best Deals
+          </h2>
+
         </div>
 
         <div className="products-grid">
@@ -220,24 +278,27 @@ function ProductSections() {
 
       </section>
     );
+
   }
 
   // =========================================================
   // NO PRODUCTS
   // =========================================================
+
   if (
     !Array.isArray(products) ||
     products.length === 0
   ) {
-    console.warn(
-      "ProductSections: Backend returned 0 valid products."
-    );
 
     return (
       <section className="product-section">
 
         <div className="product-section-header">
-          <h2>Best Deals</h2>
+
+          <h2>
+            Best Deals
+          </h2>
+
         </div>
 
         <div className="products-grid">
@@ -250,11 +311,13 @@ function ProductSections() {
 
       </section>
     );
+
   }
 
   // =========================================================
   // DISPLAY PRODUCTS
   // =========================================================
+
   console.log(
     "RENDERING PRODUCT SECTION:",
     products.length
