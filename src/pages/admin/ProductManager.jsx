@@ -13,33 +13,30 @@ const ProductManager = () => {
     price: "",
     description: "",
     category_id: "",
-    image: null,
-    images: [],
+    main_image: null,
+    gallery: [],
     colors: [],
   };
 
-  // =========================================================
-  // STATES
-  // =========================================================
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
 
   const [form, setForm] = useState(emptyForm);
 
   const [editingId, setEditingId] = useState(null);
-
   const [token, setToken] = useState("");
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
   const [colorInput, setColorInput] = useState("");
 
   // =========================================================
-  // GET ADMIN TOKEN
+  // LOAD USER + PRODUCTS + CATEGORIES
   // =========================================================
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -48,11 +45,11 @@ const ProductManager = () => {
       try {
         const parsed = JSON.parse(savedUser);
 
-        if (parsed.token) {
+        if (parsed?.token) {
           setToken(parsed.token);
         }
-      } catch (error) {
-        console.error("Error reading saved user:", error);
+      } catch (err) {
+        console.error("Invalid user data:", err);
       }
     }
 
@@ -61,91 +58,90 @@ const ProductManager = () => {
   }, []);
 
   // =========================================================
-  // GET ALL PRODUCTS
+  // GET PRODUCTS
   // =========================================================
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(
-        `${API}/api/category-products`
-      );
+      setLoadingProducts(true);
 
-      const data = response.data;
+      const { data } = await axios.get("/api/category-products");
 
       const list = Array.isArray(data)
         ? data
-        : Array.isArray(data.data)
+        : Array.isArray(data?.data)
         ? data.data
-        : Array.isArray(data.products)
-        ? data.products
         : [];
 
       setProducts(list);
-    } catch (error) {
-      console.error("Error fetching products:", error);
+    } catch (err) {
+      console.error("Error fetching category products:", err);
+
+      setProducts([]);
+    } finally {
+      setLoadingProducts(false);
     }
   };
 
   // =========================================================
-  // GET ALL CATEGORIES
+  // GET CATEGORIES
   // =========================================================
   const fetchCategories = async () => {
     try {
-      setCategoriesLoading(true);
+      setLoadingCategories(true);
 
-      const response = await axios.get(
-        `${API}/api/categories`
-      );
-
-      const data = response.data;
+      const { data } = await axios.get("/api/categories");
 
       const list = Array.isArray(data)
         ? data
-        : Array.isArray(data.data)
+        : Array.isArray(data?.data)
         ? data.data
-        : Array.isArray(data.categories)
+        : Array.isArray(data?.categories)
         ? data.categories
         : [];
 
       setCategories(list);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
 
       setCategories([]);
     } finally {
-      setCategoriesLoading(false);
+      setLoadingCategories(false);
     }
   };
 
   // =========================================================
-  // HANDLE INPUT CHANGE
+  // HANDLE INPUT
   // =========================================================
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
 
-    // MAIN IMAGE
-    if (name === "image") {
-      setForm((prev) => ({
-        ...prev,
-        image: files && files.length > 0 ? files[0] : null,
-      }));
-
-      return;
-    }
-
-    // GALLERY IMAGES
-    if (name === "images") {
-      setForm((prev) => ({
-        ...prev,
-        images: files ? Array.from(files) : [],
-      }));
-
-      return;
-    }
-
-    // NORMAL INPUT
     setForm((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  // =========================================================
+  // MAIN IMAGE
+  // =========================================================
+  const handleMainImage = (e) => {
+    const file = e.target.files?.[0] || null;
+
+    setForm((prev) => ({
+      ...prev,
+      main_image: file,
+    }));
+  };
+
+  // =========================================================
+  // GALLERY
+  // =========================================================
+  const handleGallery = (e) => {
+    const files = Array.from(e.target.files || []);
+
+    setForm((prev) => ({
+      ...prev,
+      gallery: files,
     }));
   };
 
@@ -155,11 +151,8 @@ const ProductManager = () => {
   const addColor = () => {
     const color = colorInput.trim();
 
-    if (!color) {
-      return;
-    }
+    if (!color) return;
 
-    // Prevent duplicate colors
     if (form.colors.includes(color)) {
       setColorInput("");
       return;
@@ -192,151 +185,113 @@ const ProductManager = () => {
     setError("");
     setSuccess("");
 
-    // =======================================================
+    // -------------------------------------------------------
     // LOGIN CHECK
-    // =======================================================
+    // -------------------------------------------------------
     if (!token) {
-      setError("Login required");
+      setError("Admin login required.");
       return;
     }
 
-    // =======================================================
+    // -------------------------------------------------------
     // VALIDATION
-    // =======================================================
+    // -------------------------------------------------------
     if (!form.title.trim()) {
-      setError("Product title is required");
+      setError("Product title is required.");
       return;
     }
 
-    if (!form.price || Number(form.price) <= 0) {
-      setError("Please enter a valid price");
+    if (!form.price) {
+      setError("Product price is required.");
       return;
     }
 
     if (!form.category_id) {
-      setError("Please select a category");
+      setError("Please select a category.");
       return;
     }
+
+    // -------------------------------------------------------
+    // CREATE FORM DATA
+    // -------------------------------------------------------
+    const formData = new FormData();
+
+    formData.append("title", form.title.trim());
+
+    formData.append(
+      "price",
+      form.price
+    );
+
+    formData.append(
+      "description",
+      form.description || ""
+    );
+
+    formData.append(
+      "category_id",
+      form.category_id
+    );
+
+    // -------------------------------------------------------
+    // MAIN IMAGE
+    // Backend expects:
+    // main_image
+    // -------------------------------------------------------
+    if (form.main_image) {
+      formData.append(
+        "main_image",
+        form.main_image
+      );
+    }
+
+    // -------------------------------------------------------
+    // GALLERY
+    // Backend expects:
+    // gallery
+    // -------------------------------------------------------
+    form.gallery.forEach((file) => {
+      formData.append(
+        "gallery",
+        file
+      );
+    });
+
+    // -------------------------------------------------------
+    // COLORS
+    // Backend accepts repeated colors
+    // -------------------------------------------------------
+    form.colors.forEach((color) => {
+      formData.append(
+        "colors",
+        color
+      );
+    });
 
     try {
       setLoading(true);
 
-      // =====================================================
-      // FORM DATA
-      // =====================================================
-      const formData = new FormData();
-
-      formData.append("title", form.title.trim());
-
-      formData.append(
-        "price",
-        String(form.price)
-      );
-
-      formData.append(
-        "description",
-        form.description || ""
-      );
-
-      formData.append(
-        "category_id",
-        String(form.category_id)
-      );
-
-      // =====================================================
-      // MAIN IMAGE
-      // Backend expects: main_image
-      // =====================================================
-      if (form.image) {
-        formData.append(
-          "main_image",
-          form.image
-        );
-      }
-
-      // =====================================================
-      // GALLERY
-      // Backend expects: gallery
-      // =====================================================
-      form.images.forEach((image) => {
-        formData.append(
-          "gallery",
-          image
-        );
-      });
-
-      // =====================================================
-      // COLORS
-      //
-      // IMPORTANT:
-      // Backend expects repeated "colors" fields.
-      //
-      // Don't send JSON.stringify here.
-      // =====================================================
-      form.colors.forEach((color) => {
-        formData.append(
-          "colors",
-          color
-        );
-      });
-
-      // =====================================================
-      // DEBUG
-      // =====================================================
-      console.log(
-        "================================"
-      );
-
+      console.log("==============================");
       console.log(
         editingId
-          ? "UPDATING PRODUCT"
-          : "CREATING PRODUCT"
+          ? "UPDATING CATEGORY PRODUCT"
+          : "CREATING CATEGORY PRODUCT"
       );
 
-      console.log(
-        "TITLE:",
-        form.title
-      );
-
-      console.log(
-        "PRICE:",
-        form.price
-      );
-
-      console.log(
-        "CATEGORY ID:",
-        form.category_id
-      );
-
-      console.log(
-        "COLORS:",
-        form.colors
-      );
-
-      console.log(
-        "MAIN IMAGE:",
-        form.image
-          ? form.image.name
-          : "No image"
-      );
-
-      console.log(
-        "GALLERY:",
-        form.images.map(
-          (image) => image.name
-        )
-      );
-
-      console.log(
-        "================================"
-      );
+      console.log("TITLE:", form.title);
+      console.log("PRICE:", form.price);
+      console.log("CATEGORY ID:", form.category_id);
+      console.log("COLORS:", form.colors);
+      console.log("MAIN IMAGE:", form.main_image);
+      console.log("GALLERY:", form.gallery);
+      console.log("==============================");
 
       // =====================================================
       // UPDATE
       // =====================================================
       if (editingId) {
         await axios.put(
-          `${API}/api/category-products/${editingId}`,
+          `/api/category-products/${editingId}`,
           formData,
           {
             headers: {
@@ -346,7 +301,7 @@ const ProductManager = () => {
         );
 
         setSuccess(
-          "Product updated successfully"
+          "Product updated successfully."
         );
       }
 
@@ -355,7 +310,7 @@ const ProductManager = () => {
       // =====================================================
       else {
         await axios.post(
-          `${API}/api/category-products`,
+          "/api/category-products",
           formData,
           {
             headers: {
@@ -365,49 +320,43 @@ const ProductManager = () => {
         );
 
         setSuccess(
-          "Product added successfully"
+          "Product added successfully."
         );
       }
 
       // =====================================================
-      // RESET FORM
+      // RESET
       // =====================================================
       setForm(emptyForm);
-
       setEditingId(null);
-
       setColorInput("");
 
       // =====================================================
-      // REFRESH PRODUCTS
+      // REFRESH PRODUCT LIST
       // =====================================================
       await fetchProducts();
 
-    } catch (error) {
+    } catch (err) {
       console.error(
-        "Error submitting product:",
-        error
+        "Error submitting category product:",
+        err
       );
 
       console.error(
         "STATUS:",
-        error.response?.status
+        err.response?.status
       );
 
       console.error(
         "SERVER RESPONSE:",
-        error.response?.data
+        err.response?.data
       );
-
-      const serverMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error;
 
       setError(
-        serverMessage ||
-          "Error saving product"
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Server error while saving product."
       );
-
     } finally {
       setLoading(false);
     }
@@ -417,43 +366,41 @@ const ProductManager = () => {
   // EDIT PRODUCT
   // =========================================================
   const editProduct = (product) => {
-    setError("");
-    setSuccess("");
-
     setEditingId(product.id);
+
+    let colors = [];
+
+    if (Array.isArray(product.colors)) {
+      colors = product.colors;
+    }
 
     setForm({
       title:
         product.title ||
-        product.name ||
         "",
 
       price:
-        product.price !== null &&
-        product.price !== undefined
-          ? product.price
-          : "",
+        product.price ||
+        "",
 
       description:
         product.description ||
         "",
 
       category_id:
-        product.category_id
-          ? String(product.category_id)
-          : "",
+        product.category_id ||
+        "",
 
-      image: null,
+      main_image: null,
 
-      images: [],
+      gallery: [],
 
-      colors:
-        Array.isArray(product.colors)
-          ? product.colors
-          : [],
+      colors,
     });
 
-    // Scroll to form
+    setError("");
+    setSuccess("");
+
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -465,11 +412,8 @@ const ProductManager = () => {
   // =========================================================
   const cancelEdit = () => {
     setEditingId(null);
-
     setForm(emptyForm);
-
     setColorInput("");
-
     setError("");
     setSuccess("");
   };
@@ -479,7 +423,7 @@ const ProductManager = () => {
   // =========================================================
   const deleteProduct = async (id) => {
     if (!token) {
-      alert("Login required");
+      alert("Admin login required.");
       return;
     }
 
@@ -487,16 +431,11 @@ const ProductManager = () => {
       "Are you sure you want to delete this product?"
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
-      setError("");
-      setSuccess("");
-
       await axios.delete(
-        `${API}/api/category-products/${id}`,
+        `/api/category-products/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -504,37 +443,32 @@ const ProductManager = () => {
         }
       );
 
-      setSuccess(
-        "Product deleted successfully"
+      setProducts((prev) =>
+        prev.filter(
+          (product) =>
+            Number(product.id) !== Number(id)
+        )
       );
 
-      await fetchProducts();
+      setSuccess(
+        "Product deleted successfully."
+      );
 
-    } catch (error) {
+    } catch (err) {
       console.error(
         "Error deleting product:",
-        error
-      );
-
-      console.error(
-        "STATUS:",
-        error.response?.status
-      );
-
-      console.error(
-        "SERVER RESPONSE:",
-        error.response?.data
+        err
       );
 
       setError(
-        error.response?.data?.message ||
-          "Error deleting product"
+        err.response?.data?.message ||
+        "Error deleting product."
       );
     }
   };
 
   // =========================================================
-  // GET PRODUCT IMAGE
+  // IMAGE URL
   // =========================================================
   const getImage = (product) => {
     let image = "";
@@ -569,68 +503,77 @@ const ProductManager = () => {
   };
 
   // =========================================================
-  // GET CATEGORY NAME
+  // CATEGORY NAME
   // =========================================================
   const getCategoryName = (categoryId) => {
     const category = categories.find(
       (cat) =>
-        Number(cat.id) ===
-        Number(categoryId)
+        Number(cat.id) === Number(categoryId)
     );
 
-    if (!category) {
-      return "-";
-    }
-
     return (
-      category.title ||
-      category.name ||
-      "-"
+      category?.title ||
+      category?.name ||
+      `Category ${categoryId || "-"}`
     );
   };
 
   // =========================================================
-  // PAGE
+  // RENDER
   // =========================================================
   return (
     <div className="admin-dashboard-container">
 
       {/* =====================================================
-          TITLE
-      ====================================================== */}
-      <h1 className="admin-title">
-        Manage Products
-      </h1>
+          HEADER
+      ===================================================== */}
+      <div className="admin-dashboard-header">
+
+        <div>
+          <h1 className="admin-title">
+            Manage Products
+          </h1>
+
+          <p>
+            Add products that appear directly inside
+            your selected category.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="btn primary"
+          onClick={() => {
+            fetchProducts();
+            fetchCategories();
+          }}
+        >
+          Refresh
+        </button>
+
+      </div>
 
       {/* =====================================================
           ERROR
-      ====================================================== */}
+      ===================================================== */}
       {error && (
-        <div
-          style={{
-            color: "#b91c1c",
-            background: "#fee2e2",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            marginBottom: "15px",
-            fontWeight: "600",
-          }}
-        >
+        <div className="admin-error">
           {error}
         </div>
       )}
 
       {/* =====================================================
           SUCCESS
-      ====================================================== */}
+      ===================================================== */}
       {success && (
         <div
           style={{
-            color: "#166534",
-            background: "#dcfce7",
             padding: "12px 16px",
+            marginBottom: "20px",
             borderRadius: "8px",
-            marginBottom: "15px",
+            background: "#e8f8ee",
+            color: "#187a3d",
+            border: "1px solid #b8e5c8",
             fontWeight: "600",
           }}
         >
@@ -639,8 +582,8 @@ const ProductManager = () => {
       )}
 
       {/* =====================================================
-          PRODUCT FORM
-      ====================================================== */}
+          FORM
+      ===================================================== */}
       <form
         className="admin-form"
         onSubmit={handleSubmit}
@@ -652,40 +595,21 @@ const ProductManager = () => {
             : "Add Product"}
         </h2>
 
-        {/* ===================================================
-            PRODUCT TITLE
-        ==================================================== */}
+        {/* TITLE */}
         <label>
-          Product Name
+          Product Title
         </label>
 
         <input
           type="text"
           name="title"
-          placeholder="Product Name"
+          placeholder="Product Title"
           value={form.title}
           onChange={handleChange}
           required
         />
 
-        {/* ===================================================
-            DESCRIPTION
-        ==================================================== */}
-        <label>
-          Description
-        </label>
-
-        <textarea
-          name="description"
-          placeholder="Product Description"
-          value={form.description}
-          onChange={handleChange}
-          rows="5"
-        />
-
-        {/* ===================================================
-            PRICE
-        ==================================================== */}
+        {/* PRICE */}
         <label>
           Price
         </label>
@@ -701,9 +625,20 @@ const ProductManager = () => {
           required
         />
 
-        {/* ===================================================
-            CATEGORY
-        ==================================================== */}
+        {/* DESCRIPTION */}
+        <label>
+          Description
+        </label>
+
+        <textarea
+          name="description"
+          placeholder="Product Description"
+          value={form.description}
+          onChange={handleChange}
+          rows="5"
+        />
+
+        {/* CATEGORY */}
         <label>
           Category
         </label>
@@ -713,74 +648,67 @@ const ProductManager = () => {
           value={form.category_id}
           onChange={handleChange}
           required
+          disabled={loadingCategories}
         >
 
           <option value="">
-            {categoriesLoading
+            {loadingCategories
               ? "Loading categories..."
               : "Select Category"}
           </option>
 
-          {categories.map(
-            (category) => (
-              <option
-                key={category.id}
-                value={category.id}
-              >
-                {category.title ||
-                  category.name ||
-                  `Category ${category.id}`}
-              </option>
-            )
-          )}
+          {categories.map((category) => (
+            <option
+              key={category.id}
+              value={category.id}
+            >
+              {category.title ||
+                category.name ||
+                `Category ${category.id}`}
+            </option>
+          ))}
 
         </select>
 
-        {/* ===================================================
-            MAIN IMAGE
-        ==================================================== */}
+        {/* MAIN IMAGE */}
         <label>
           Main Image
         </label>
 
         <input
           type="file"
-          name="image"
+          name="main_image"
           accept="image/*"
-          onChange={handleChange}
+          onChange={handleMainImage}
         />
 
-        {form.image && (
+        {form.main_image && (
           <small>
-            Selected: {form.image.name}
+            Selected: {form.main_image.name}
           </small>
         )}
 
-        {/* ===================================================
-            GALLERY
-        ==================================================== */}
+        {/* GALLERY */}
         <label>
           Gallery Images
         </label>
 
         <input
           type="file"
-          name="images"
+          name="gallery"
           accept="image/*"
           multiple
-          onChange={handleChange}
+          onChange={handleGallery}
         />
 
-        {form.images.length > 0 && (
+        {form.gallery.length > 0 && (
           <small>
-            {form.images.length} gallery image(s)
+            {form.gallery.length} gallery image(s)
             selected
           </small>
         )}
 
-        {/* ===================================================
-            COLORS
-        ==================================================== */}
+        {/* COLORS */}
         <h3>
           Colors
         </h3>
@@ -791,9 +719,7 @@ const ProductManager = () => {
             type="text"
             value={colorInput}
             onChange={(e) =>
-              setColorInput(
-                e.target.value
-              )
+              setColorInput(e.target.value)
             }
             placeholder="Add Color"
             onKeyDown={(e) => {
@@ -806,17 +732,15 @@ const ProductManager = () => {
 
           <button
             type="button"
-            onClick={addColor}
             className="btn primary"
+            onClick={addColor}
           >
             Add
           </button>
 
         </div>
 
-        {/* ===================================================
-            COLOR TAGS
-        ==================================================== */}
+        {/* COLOR TAGS */}
         <div className="tag-list">
 
           {form.colors.map(
@@ -825,120 +749,128 @@ const ProductManager = () => {
                 key={`${color}-${index}`}
                 className="tag"
                 style={{
-                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
                 }}
-                onClick={() =>
-                  removeColor(index)
-                }
-                title="Click to remove"
               >
-                {color} ×
+
+                {color}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    removeColor(index)
+                  }
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                  }}
+                >
+                  ×
+                </button>
+
               </span>
             )
           )}
 
         </div>
 
-        {/* ===================================================
-            SUBMIT
-        ==================================================== */}
-        <button
-          type="submit"
-          className="btn success"
-          disabled={loading}
+        {/* BUTTONS */}
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            marginTop: "20px",
+          }}
         >
-          {loading
-            ? "Saving..."
-            : editingId
-            ? "Update Product"
-            : "Add Product"}
-        </button>
 
-        {/* ===================================================
-            CANCEL EDIT
-        ==================================================== */}
-        {editingId && (
           <button
-            type="button"
-            className="btn"
-            onClick={cancelEdit}
-            style={{
-              marginLeft: "10px",
-            }}
+            type="submit"
+            className="btn success"
+            disabled={loading}
           >
-            Cancel
+            {loading
+              ? "Saving..."
+              : editingId
+              ? "Update Product"
+              : "Add Product"}
           </button>
-        )}
+
+          {editingId && (
+            <button
+              type="button"
+              className="btn"
+              onClick={cancelEdit}
+            >
+              Cancel
+            </button>
+          )}
+
+        </div>
 
       </form>
 
       {/* =====================================================
           PRODUCTS LIST
-      ====================================================== */}
-      <h2 className="admin-section-title">
-        Products List
-      </h2>
+      ===================================================== */}
+      <div className="admin-dashboard-header">
 
-      <table className="admin-table">
+        <div>
+          <h2 className="admin-section-title">
+            Products List
+          </h2>
 
-        <thead>
+          <p>
+            Products stored in category_products.
+          </p>
+        </div>
 
-          <tr>
+      </div>
 
-            <th>
-              Img
-            </th>
+      <div className="admin-table-wrapper">
 
-            <th>
-              Title
-            </th>
+        <table className="admin-table">
 
-            <th>
-              Category
-            </th>
-
-            <th>
-              Price
-            </th>
-
-            <th>
-              Actions
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          {products.length === 0 ? (
-
+          <thead>
             <tr>
-
-              <td
-                colSpan="5"
-                style={{
-                  textAlign: "center",
-                  padding: "30px",
-                }}
-              >
-                No products found.
-              </td>
-
+              <th>Image</th>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Actions</th>
             </tr>
+          </thead>
 
-          ) : (
+          <tbody>
 
-            products.map(
-              (product) => {
+            {loadingProducts ? (
+
+              <tr>
+                <td colSpan="5">
+                  Loading products...
+                </td>
+              </tr>
+
+            ) : products.length === 0 ? (
+
+              <tr>
+                <td colSpan="5">
+                  No products found.
+                </td>
+              </tr>
+
+            ) : (
+
+              products.map((product) => {
 
                 const imageUrl =
                   getImage(product);
 
                 return (
-                  <tr
-                    key={product.id}
-                  >
+                  <tr key={product.id}>
 
                     {/* IMAGE */}
                     <td>
@@ -951,13 +883,11 @@ const ProductManager = () => {
                             product.title ||
                             "Product"
                           }
-                          width="60"
-                          height="60"
+                          width="70"
+                          height="70"
                           style={{
-                            objectFit:
-                              "cover",
-                            borderRadius:
-                              "8px",
+                            objectFit: "cover",
+                            borderRadius: "8px",
                           }}
                           onError={(e) => {
                             e.currentTarget.style.display =
@@ -977,9 +907,15 @@ const ProductManager = () => {
 
                     {/* TITLE */}
                     <td>
-                      {product.title ||
-                        product.name ||
-                        "-"}
+                      {product.title || "-"}
+                    </td>
+
+                    {/* PRICE */}
+                    <td>
+                      {Number(
+                        product.price || 0
+                      ).toFixed(2)}{" "}
+                      AED
                     </td>
 
                     {/* CATEGORY */}
@@ -989,53 +925,55 @@ const ProductManager = () => {
                       )}
                     </td>
 
-                    {/* PRICE */}
-                    <td>
-                      AED{" "}
-                      {Number(
-                        product.price || 0
-                      ).toFixed(2)}
-                    </td>
-
                     {/* ACTIONS */}
                     <td>
 
-                      <button
-                        type="button"
-                        className="btn primary small"
-                        onClick={() =>
-                          editProduct(
-                            product
-                          )
-                        }
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          flexWrap: "wrap",
+                        }}
                       >
-                        Edit
-                      </button>
 
-                      <button
-                        type="button"
-                        className="btn danger small"
-                        onClick={() =>
-                          deleteProduct(
-                            product.id
-                          )
-                        }
-                      >
-                        Delete
-                      </button>
+                        <button
+                          type="button"
+                          className="btn primary small"
+                          onClick={() =>
+                            editProduct(
+                              product
+                            )
+                          }
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn danger small"
+                          onClick={() =>
+                            deleteProduct(
+                              product.id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+
+                      </div>
 
                     </td>
 
                   </tr>
                 );
-              }
-            )
+              })
+            )}
 
-          )}
+          </tbody>
 
-        </tbody>
+        </table>
 
-      </table>
+      </div>
 
     </div>
   );
